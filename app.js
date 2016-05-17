@@ -52,16 +52,22 @@ if ('serviceWorker' in navigator) {
 
 window.onload = function () {
 
+    postMessageToServiceWorker({name: 'RELOAD_INIT'})
+    
+}
 
+
+let postMessageToServiceWorker = (msg) => {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-            name: 'RELOAD_INIT',
-            time: 6000
-        });
+        navigator.serviceWorker.controller.postMessage(msg);
     } else {
         console.warn(' service worker not installed yet')
     }
 }
+
+document.addEventListener('CONTENT_LOADED', function(){
+        postMessageToServiceWorker({ name: 'CONTENT_LOADED'})
+})
 
 navigator.serviceWorker.addEventListener('message', function (event) {
     var eventData = event.data;

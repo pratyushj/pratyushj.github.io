@@ -30,6 +30,9 @@ self.addEventListener('message', function(event){
     if( eventData.name  ==  'RELOAD_INIT'){
         initialize(eventData.time)
     }
+    if ( eventData.name == 'CONTENT_LOADED'){
+        calculateAndDispatchResourceData()
+    }
 });
 
 

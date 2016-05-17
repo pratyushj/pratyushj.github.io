@@ -26,13 +26,21 @@ let bandWidthCalculatorMiddleWare = function() {
 
 let initialize =  function (time) {
     mapOfResponseSizeByResource =  {};
-    timeout  = setTimeout(() => {
-        clearTimeout(timeout)
-        dispatchMessageToAllClients({msgName: 'BW_CALC', data: _processResourceData()});
-    },time)
+    if( typeof time != 'undefined' ){
+
+        timeout  = setTimeout(() => {
+            clearTimeout(timeout)
+           calculateAndDispatchResourceData()
+         },time)
+     
+    }
+
+   
 }
 
-
+let calculateAndDispatchResourceData =  ()=>{
+     dispatchMessageToAllClients({msgName: 'BW_CALC', data: _processResourceData()});
+}
 
 let _processResourceData = () => {
     var totalSize = 0,

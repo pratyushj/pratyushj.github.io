@@ -181,7 +181,10 @@
 
     function raiseEventForBWCalculation(val) {
         //TODO Based on how things are to be raised to reach
-        console.log('bandwidth is %s MbPS ',val)
+        console.log('bandwidth is %s Mbps ',val)
+
+        var myEvent = new CustomEvent("CONTENT_LOADED");
+        document.dispatchEvent(myEvent)
     }
 
 
