@@ -45,7 +45,7 @@ let _processResourceData = () => {
                 totalTime  += resource.responseEnd - resource.responseStart
             }
     });
-    return ((( totalSize) / (1024 * 1024)) / ( totalTime / 1000 )).toFixed(2)
+    return ((( totalSize*8) / (1024 * 1024)) / ( totalTime / 1000 )).toFixed(2)
 };
 
 let _pushDataForBWCalculation = (url, size) => {

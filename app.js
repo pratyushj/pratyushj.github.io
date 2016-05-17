@@ -61,26 +61,6 @@ window.onload = function () {
     } else {
         console.warn(' service worker not installed yet')
     }
-
-    var container = document.getElementById('container');
-
-    if (container) {
-        // appendImages(container)
-    } else {
-        console.error('container div not available')
-    }
-
-    function appendImages(container) {
-        var arr = ['128481.jpg', '128482.jpg', '128483.jpg', '128484.jpg', '128485.jpg', '128486.jpg', '128487.jpg', '128488.jpg', '128489.jpg', '128490.jpg'];
-        var path = '/images/';
-        var imgElement;
-        arr.forEach(function (img) {
-            imgElement = document.createElement('img');
-            imgElement.src = path + img;
-            imgElement.style.display = 'none'
-            container.appendChild(imgElement)
-        })
-    }
 }
 
 navigator.serviceWorker.addEventListener('message', function (event) {
@@ -89,7 +69,7 @@ navigator.serviceWorker.addEventListener('message', function (event) {
     switch (eventData.msgName) {
 
         case 'BW_CALC':
-            console.log('Bandwidth calculation is ', eventData.data)
+            console.log('Bandwidth calculated via SW is %s Mbps ', eventData.data)
             break;
         default:
 

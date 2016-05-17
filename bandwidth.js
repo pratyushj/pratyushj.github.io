@@ -27,7 +27,7 @@
         URI = URI.map(function (uri) {
             return BASE_URL +STATIC_URI+ uri + EXT
         });
-        
+
     var SINGLE_URI =  BASE_URL+ SINGLE_DATA + EXT
 
 
@@ -137,7 +137,8 @@
 
 
     function calculateBandwidth() {
-        console.log(JSON.stringify(SIZE_TIME_ARRAY))
+        // console.log(JSON.stringify(SIZE_TIME_ARRAY))
+        console.log(`Number of requests is `,SIZE_TIME_ARRAY.length)
         var sumOfSizes = SIZE_TIME_ARRAY.reduce(function (prevVal, currentVal, currentIndex) {
             prevVal += parseFloat(SIZE_TIME_ARRAY[currentIndex].size)
             return prevVal
@@ -150,7 +151,7 @@
 
         if ((sumOfTimesTaken > 0) && !isNaN(sumOfSizes)) {
             console.log('sum of time taken %d and size %d    ',sumOfTimesTaken, sumOfSizes)
-            var bandwidth = ((( sumOfSizes) / (1024 * 1024)) / ( sumOfTimesTaken / 1000 )).toFixed(2)//this is bytes in miliseconds, so convert them into Mb and second
+            var bandwidth = ((( sumOfSizes*8) / (1024 * 1024)) / ( sumOfTimesTaken / 1000 )).toFixed(2)//this is bytes in miliseconds, so convert them into Mb and second
 
             // persistInStorage(bandwidth)
             raiseEventForBWCalculation(bandwidth)
@@ -180,7 +181,7 @@
 
     function raiseEventForBWCalculation(val) {
         //TODO Based on how things are to be raised to reach
-        console.log('bandwidth is %s MBPS ',val)
+        console.log('bandwidth is %s MbPS ',val)
     }
 
 
