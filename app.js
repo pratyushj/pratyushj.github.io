@@ -10,7 +10,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./ServiceWorker.js', {scope: '/'}).then(function (registration) {
 
         console.log('SW registered for the scope ', registration.scope);
-        location.reload()
 
     }).catch(function (err) {
 
