@@ -24,7 +24,10 @@
         SESSION_BW_TS = 'ck-bw-expiry-ts',
         PARALLEL_REQUESTS = false
 
-
+        URI = URI.map(function (uri) {
+            return BASE_URL +STATIC_URI+ uri + EXT
+        });
+        
     var SINGLE_URI =  BASE_URL+ SINGLE_DATA + EXT
 
 
