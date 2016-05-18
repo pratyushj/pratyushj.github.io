@@ -26,12 +26,17 @@ self.addEventListener('fetch', (event) => {
 });
 self.addEventListener('message', function(event){
     var eventData =  event.data
-    console.log(eventData)
+    console.log(eventData);
+    var response = {};
     if( eventData.name  ==  'RELOAD_INIT'){
         initialize(eventData.time)
     }else if ( eventData.name == 'CONTENT_LOADED'){
-        calculateAndDispatchResourceData(eventData.data)
+        response = calculateAndDispatchResourceData(eventData.data)
+    }else{
+
     }
+
+     event.ports[0].postMessage(response);
 });
 self.addEventListener('install', function(event){
     console.log('service Worker Installed!');

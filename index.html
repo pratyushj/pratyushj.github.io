@@ -3,11 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Bandwidth POC</title>
+	<style>
+		.table{
+			text-align: center;
+			width: 100%;
+		}
+		#container{
+			position: absolute;
+			left: 20%;
+			width: 50%;
+			top: 10%;
+			font-size: 40px;
+		}
+		table,th,td{
+			border: 1px solid lightgrey;
+		}
+	</style>
 </head>
 <body>
 <div id='container'>
 	
-<table>
+<table class="table">
 	<thead>
 		<tr>
 		<th>Method</th>
@@ -16,18 +32,22 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>Bandwidth Method I (Round Time in Front End)</td>
+			<td>Bandwidth Method I (Round Time in Front End) *</td>
 			<td id="bw1"></td>
 		</tr>
 		<tr>
-			<td>Bandwidth Method II (Service Worker + Resource Timing API )</td>
+			<td>Bandwidth Method II (Service Worker + Resource Timing API ) **</td>
 			<td id="bw2"></td>
 		</tr>
 	</tbody>
 </table>
 
-
-
+	<b>*</b> Intercepts all the  HTTP requests  made by javascript ( not including browser initiated requests) in the front end code and does a calculation of bandwidth.
+	  However, the time taken in this case is inclusive of queue time, latency, server processing time etc etc
+	<br/>
+	<br/>
+	<b>**</b> Intercepts all the HTTP Requests made in the webapp ( including browser initiated requests) at the Service Worker Layer. The time taken for calculation is only the
+			   time for which the content is downloaded (responseEnd - responseStart). So, it should be more precise
 </div>
 </body>
  <script src="bandwidth.js"></script>

@@ -10,7 +10,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./ServiceWorker.js').then(function (registration) {
 
         console.log('SW registered for the scope ', registration.scope);
-        // postMessageToServiceWorker({name: 'RELOAD_INIT'})
 
     }).catch(function (err) {
 
@@ -53,13 +52,24 @@ if ('serviceWorker' in navigator) {
 
 
 let postMessageToServiceWorker = (msg) => {
-    console.log(navigator.serviceWorker.controller)
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         console.info('msg sent to SW -->', JSON.stringify(msg));
         var msg_chan = new MessageChannel();
         msg_chan.port1.onmessage = function(event){
-            
+             var eventData = event.data;
+
+                switch (eventData.msgName) {
+
+                    case 'BW_CALC':
+                        console.log('Bandwidth calculated via SW is %s Mbps ', eventData.data)
+                         document.getElementById('bw2').innerHTML = eventData.data
+                        break;
+                    default:
+
+                        break;
+                }
         }
+        
         navigator.serviceWorker.controller.postMessage(msg, [msg_chan.port2]);
     } else {
         console.warn(' service worker not installed yet')
@@ -92,16 +102,5 @@ document.addEventListener('CUST_CONTENT_LOADED', function(e){
 },false)
 
 navigator.serviceWorker.addEventListener('message', function (event) {
-    var eventData = event.data;
-
-    switch (eventData.msgName) {
-
-        case 'BW_CALC':
-            console.log('Bandwidth calculated via SW is %s Mbps ', eventData.data)
-             document.getElementById('bw2').innerHTML = eventData.data
-            break;
-        default:
-
-            break;
-    }
+   
 });

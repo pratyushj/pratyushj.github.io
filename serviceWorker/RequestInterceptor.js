@@ -35,7 +35,7 @@ let initialize =  function (time) {
 }
 
 let calculateAndDispatchResourceData =  (data)=>{
-     dispatchMessageToAllClients({msgName: 'BW_CALC', data: _processResourceData(data)});
+     return {msgName: 'BW_CALC', data: _processResourceData(data)};
 }
 
 let _processResourceData = (resources) => {
