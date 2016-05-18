@@ -63,6 +63,8 @@ let postMessageToServiceWorker = (msg) => {
                     case 'BW_CALC':
                         console.log('Bandwidth calculated via SW is %s Mbps ', eventData.data)
                          document.getElementById('bw2').innerHTML = eventData.data
+                        document.getElementById('bwContainer').style.display = 'block';
+                        document.getElementById('bwLoader').style.display = 'none'
                         break;
                     default:
 

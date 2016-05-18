@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Bandwidth POC</title>
 	<style>
-		.table{
+		.bwTable{
 			text-align: center;
 			width: 100%;
 		}
@@ -18,12 +18,18 @@
 		table,th,td{
 			border: 1px solid lightgrey;
 		}
+		#bwLoader{
+			display: block;
+		}
+		#bwContainer {
+			display: none;
+		}
 	</style>
 </head>
 <body>
-<div id='container'>
-	
-<table class="table">
+<div id='container' class="container">
+	<div id="bwContainer">
+<table class="bwTable">
 	<thead>
 		<tr>
 		<th>Method</th>
@@ -48,6 +54,10 @@
 	<br/>
 	<b>**</b> Intercepts all the HTTP Requests made in the webapp ( including browser initiated requests) at the Service Worker Layer. The time taken for calculation is only the
 			   time for which the content is downloaded (responseEnd - responseStart). So, it should be more precise
+</div>
+<div id="bwLoader" >
+	<p>Please Wait While We Display Bandwidth Details  ...</p>
+</div>
 </div>
 </body>
  <script src="bandwidth.js"></script>
