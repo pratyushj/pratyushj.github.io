@@ -17,7 +17,6 @@ let bandWidthCalculatorMiddleWare = function() {
         if(response.status == 200  && response.ok ){
 
             var size = response.headers.get('Content-Length');
-
             _pushDataForBWCalculation(response.url, size)
         }
 
@@ -32,25 +31,25 @@ let initialize =  function (time) {
             clearTimeout(timeout)
            calculateAndDispatchResourceData()
          },time)
-     
-    }
-
-   
+    } 
 }
 
-let calculateAndDispatchResourceData =  ()=>{
-     dispatchMessageToAllClients({msgName: 'BW_CALC', data: _processResourceData()});
+let calculateAndDispatchResourceData =  (data)=>{
+     dispatchMessageToAllClients({msgName: 'BW_CALC', data: _processResourceData(data)});
 }
 
-let _processResourceData = () => {
+let _processResourceData = (resources) => {
     var totalSize = 0,
-        totalTime = 0,
-        resources  =  performance.getEntriesByType('resource');
-
+        totalTime = 0;
+        resourcesOnSW  =  performance.getEntriesByType('resource');
+        resources  =  resources || resourcesOnSW 
+        console.debug('on sw  resource size is %s and from web getting %s ', resourcesOnSW.length , resources.length)
     resources.forEach((resource) => {
-            if( !isNaN(parseInt(mapOfResponseSizeByResource[resource.name]))   || 'transferSize' in resource ){
+            if( !isNaN(parseInt(mapOfResponseSizeByResource[resource.name]))   ||  typeof resource['transferSize'] != 'undefined' ){
                  totalSize += resource.transferSize || parseInt(mapOfResponseSizeByResource[resource.name]);
                 totalTime  += resource.responseEnd - resource.responseStart
+            }else{
+                console.warn('size not defined for resource ', resource.name)
             }
     });
     return ((( totalSize*8) / (1024 * 1024)) / ( totalTime / 1000 )).toFixed(2)

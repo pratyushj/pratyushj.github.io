@@ -50,23 +50,37 @@ if ('serviceWorker' in navigator) {
     })(XMLHttpRequest.prototype.send);
 }
 
-window.onload = function () {
-
-    postMessageToServiceWorker({name: 'RELOAD_INIT'})
-    
-}
-
 
 let postMessageToServiceWorker = (msg) => {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        console.info('msg sent to SW -->', JSON.stringify(msg));
         navigator.serviceWorker.controller.postMessage(msg);
     } else {
         console.warn(' service worker not installed yet')
     }
 }
 
+
+window.onload = function () {
+
+    postMessageToServiceWorker({name: 'RELOAD_INIT'})
+
+}
+
+
+
+
 document.addEventListener('CONTENT_LOADED', function(){
-        postMessageToServiceWorker({ name: 'CONTENT_LOADED'})
+        
+      let data =  performance.getEntriesByType('resource').map(resource => {
+                        return {
+                            name: resource.name,
+                            transferSize : resource.transferSize,
+                            responseEnd : resource.responseEnd,
+                            responseStart : resource.responseStart
+                        }
+        })
+        postMessageToServiceWorker({ name: 'CONTENT_LOADED',data})
 })
 
 navigator.serviceWorker.addEventListener('message', function (event) {

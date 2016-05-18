@@ -15,7 +15,6 @@ self.addEventListener('fetch', (event) => {
 
     event.respondWith(
         fetch(event.request).then((response) => {
-            // console.log(response)
             middleWare(response)
             return response;
 
@@ -31,13 +30,13 @@ self.addEventListener('message', function(event){
         initialize(eventData.time)
     }
     if ( eventData.name == 'CONTENT_LOADED'){
-        calculateAndDispatchResourceData()
+        calculateAndDispatchResourceData(eventData.data)
     }
 });
 
 
 let dispatchMessageToAllClients  = (msg)  => {
-
+    console.info('msg sent to document ->', JSON.stringify(msg))
     clients.matchAll().then(clients => {
         clients.forEach(client => {
             dispatchMessageToClient(client, msg).then(m => {
