@@ -22,7 +22,7 @@
         SIZE_TIME_ARRAY = [],
         SESSION_BW_KEY = 'ck-bw-web',
         SESSION_BW_TS = 'ck-bw-expiry-ts',
-        PARALLEL_REQUESTS = false
+        PARALLEL_REQUESTS = true
 
         URI = URI.map(function (uri) {
             return BASE_URL +STATIC_URI+ uri + EXT
