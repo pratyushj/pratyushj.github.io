@@ -42,8 +42,8 @@ let _processResourceData = (resources) => {
     var totalSize = 0,
         totalTime = 0;
         resourcesOnSW  =  performance.getEntriesByType('resource');
-        resources  =  resources || resourcesOnSW 
-        console.debug('on sw  resource size is %s and from web getting %s ', resourcesOnSW.length , resources.length)
+        resources  =  resources || resourcesOnSW ;
+        // console.debug('on sw  resource size is %s and from web getting %s ', resourcesOnSW.length , resources.length)
     resources.forEach((resource) => {
             if( !isNaN(parseInt(mapOfResponseSizeByResource[resource.name]))   ||  typeof resource['transferSize'] != 'undefined' ){
                  totalSize += resource.transferSize || parseInt(mapOfResponseSizeByResource[resource.name]);

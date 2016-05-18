@@ -26,14 +26,19 @@ self.addEventListener('fetch', (event) => {
 });
 self.addEventListener('message', function(event){
     var eventData =  event.data
+    console.log(eventData)
     if( eventData.name  ==  'RELOAD_INIT'){
         initialize(eventData.time)
-    }
-    if ( eventData.name == 'CONTENT_LOADED'){
+    }else if ( eventData.name == 'CONTENT_LOADED'){
         calculateAndDispatchResourceData(eventData.data)
     }
 });
-
+self.addEventListener('install', function(event){
+    console.log('service Worker Installed!');
+});
+self.addEventListener('activate', function(event){
+    console.log('service Worker Activated!');
+});
 
 let dispatchMessageToAllClients  = (msg)  => {
     console.info('msg sent to document ->', JSON.stringify(msg))

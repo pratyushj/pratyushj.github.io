@@ -5,7 +5,30 @@
     <title>Bandwidth POC</title>
 </head>
 <body>
-<div id='container'></div>
+<div id='container'>
+	
+<table>
+	<thead>
+		<tr>
+		<th>Method</th>
+		<th>BandWidth (Mbps)
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Bandwidth Method I (Round Time in Front End)</td>
+			<td id="bw1"></td>
+		</tr>
+		<tr>
+			<td>Bandwidth Method II (Service Worker + Resource Timing API )</td>
+			<td id="bw2"></td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+</div>
 </body>
  <script src="bandwidth.js"></script>
 <script type="text/javascript" src="./app.js"></script>

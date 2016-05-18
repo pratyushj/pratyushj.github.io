@@ -7,9 +7,10 @@
 
 if ('serviceWorker' in navigator) {
 
-    navigator.serviceWorker.register('./ServiceWorker.js', {scope: '/'}).then(function (registration) {
+    navigator.serviceWorker.register('./ServiceWorker.js').then(function (registration) {
 
         console.log('SW registered for the scope ', registration.scope);
+        // postMessageToServiceWorker({name: 'RELOAD_INIT'})
 
     }).catch(function (err) {
 
@@ -52,26 +53,31 @@ if ('serviceWorker' in navigator) {
 
 
 let postMessageToServiceWorker = (msg) => {
+    console.log(navigator.serviceWorker.controller)
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         console.info('msg sent to SW -->', JSON.stringify(msg));
-        navigator.serviceWorker.controller.postMessage(msg);
+        var msg_chan = new MessageChannel();
+        msg_chan.port1.onmessage = function(event){
+            
+        }
+        navigator.serviceWorker.controller.postMessage(msg, [msg_chan.port2]);
     } else {
         console.warn(' service worker not installed yet')
     }
 }
 
 
-window.onload = function () {
+window.addEventListener('load', function () {
 
     postMessageToServiceWorker({name: 'RELOAD_INIT'})
 
-}
+})
 
 
 
 
-document.addEventListener('CONTENT_LOADED', function(){
-        
+document.addEventListener('CUST_CONTENT_LOADED', function(e){
+        e.preventDefault();
       let data =  performance.getEntriesByType('resource').map(resource => {
                         return {
                             name: resource.name,
@@ -81,7 +87,9 @@ document.addEventListener('CONTENT_LOADED', function(){
                         }
         })
         postMessageToServiceWorker({ name: 'CONTENT_LOADED',data})
-})
+
+        document.getElementById('bw1').innerHTML = e.detail.bw
+},false)
 
 navigator.serviceWorker.addEventListener('message', function (event) {
     var eventData = event.data;
@@ -90,6 +98,7 @@ navigator.serviceWorker.addEventListener('message', function (event) {
 
         case 'BW_CALC':
             console.log('Bandwidth calculated via SW is %s Mbps ', eventData.data)
+             document.getElementById('bw2').innerHTML = eventData.data
             break;
         default:
 

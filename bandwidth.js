@@ -183,7 +183,7 @@
         //TODO Based on how things are to be raised to reach
         console.log('bandwidth is %s Mbps ',val)
 
-        var myEvent = new CustomEvent("CONTENT_LOADED");
+        var myEvent = new CustomEvent("CUST_CONTENT_LOADED",{detail:{bw:val}});
         document.dispatchEvent(myEvent)
     }
 
