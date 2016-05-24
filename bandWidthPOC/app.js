@@ -14,6 +14,7 @@ let getTemplate  =  (data)=>{
             <td>${data.totalTime}</td>
             <td>${data.length}</td>
             <td>${data.bandwidth}</td>
+            <td>${data.bandWidth_GM}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
             <td>${data.latency}</td>`
@@ -39,7 +40,8 @@ let calculateBandWidth =  function(data,ele){
         totalTime = 0,
         duration  = 0,
         browserBlock = 0,
-        latency =  0;
+        latency =  0,
+        bandWidth_GM =  1
 
     if( Array.isArray(data)){
     	data.forEach( (res) => {
@@ -48,8 +50,9 @@ let calculateBandWidth =  function(data,ele){
             duration  += parseInt(res.duration);
             browserBlock += parseInt(res.browserBlock);
             latency   += parseInt(res.latency)
-            res.startTime  = res.startTime || 0
-             console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} at ${res.startTime.toFixed(2)} ms`)
+            res.startTime  = res.startTime || 0;
+            bandWidth_GM *= res.totalSize*8*1000/(1024*1024* res.totalTime)
+            console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} at ${res.startTime.toFixed(2)} ms`)
     	})
     }else{
     	throw new Error(`${typeof data} type is not handled for calculation of bandwidth`)
@@ -59,6 +62,7 @@ let calculateBandWidth =  function(data,ele){
         duration  = duration/1000;
         browserBlock  =  browserBlock/1000;
         latency  =  latency/1000;
+        bandWidth_GM  = Math.pow(bandWidth_GM, 1/data.length)
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
  	var bandwidth =   (totalSize*8/totalTime).toFixed(2)
@@ -73,7 +77,8 @@ let calculateBandWidth =  function(data,ele){
         browserBlock,
         latency,
         length : data.length,
-        ele
+        ele,
+        bandWidth_GM
     })
 
     getElementById(ele).innerHTML = template
