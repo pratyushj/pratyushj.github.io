@@ -62,7 +62,7 @@ let calculateBandWidth =  function(data,ele){
         duration  = duration/1000;
         browserBlock  =  browserBlock/1000;
         latency  =  latency/1000;
-        bandWidth_GM  = Math.pow(bandWidth_GM, 1/data.length)
+        bandWidth_GM  = (Math.pow(bandWidth_GM, 1/data.length)).toFixed(2)
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
  	var bandwidth =   (totalSize*8/totalTime).toFixed(2)
@@ -217,8 +217,15 @@ let clearTables =  ()=>{
 
 let postInit = () =>{
 
-    if ( NO_OF_DATA_POINTS > URI.length ){
-        URI = URI.concat(URI.slice(0, NO_OF_DATA_POINTS- URI.length+1))
+    let numOfIterations =  Math.floor(NO_OF_DATA_POINTS/URI.length);
+    let extraEntries =  NO_OF_DATA_POINTS%URI.length
+
+    for( let i = 0; i < numOfIterations-1 ; i++ ){
+        URI =  URI.concat(URI)
+    }
+
+    if ( extraEntries > 0 ){
+        URI = URI.concat(URI.slice(0, extraEntries))
     }
     // console.log(URI)
    
