@@ -10,50 +10,75 @@
 		}
 		#container{
 			position: absolute;
-			left: 20%;
-			width: 50%;
+			left: 0%;
+			width: 100%;
 			top: 10%;
-			font-size: 40px;
+			font-size: 20px;
 		}
 		table,th,td{
 			border: 1px solid lightgrey;
 		}
 		#bwLoader{
 			display: block;
+			position: relative;
+			left: 20%;
+			top: 10%;
 		}
 		#bwContainer {
 			display: none;
+			position: relative;
+			left: 20%;
+			width: 50%;
+			top: 10%;
+			font-size: 20px;
+		}
+		label{
+			text-align: center;
 		}
 	</style>
 </head>
 <body>
+
 <div id='container' class="container">
+	<div id="ctrlPanel">
+	<label>Control Panel</label>
+		<table>
+		<tbody>
+			<tr>
+				<td>Request Type</td>
+				<td id='optionContainer'>
+				
+				</td>
+			</tr>
+			<tr>
+				<td>Number Of Requests</td>
+				<td id='numberContainer'>
+					
+				</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
 	<div id="bwContainer">
-<table class="bwTable">
-	<thead>
-		<tr>
-		<th>Method</th>
-		<th>TotalSize ( MB)</th>
-		<th>TotalTime (secs)</th>
-		<th>Number Of Resources</th>
-		<th>BandWidth (Mbps)</th>
-		<th>Duration (secs)</th>
-		<th>BrowserBlock (secs)</th>
-		<th>Latency (secs)</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr id="bw1">
-			<td>Bandwidth Method I (Round Time in Front End) *</td>
-		</tr>
-		<tr id="bw2">
-			<td>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</td>
-		</tr>
-		<tr id="bw3" >
-			<td>Bandwidth Method III (Service Worker + Resource Timing API at Application ) **</td>
-		</tr>
-	</tbody>
-</table>
+		<table class="bwTable">
+			<thead>
+				<tr>
+				<th>Method</th>
+				<th>TotalSize ( MB)</th>
+				<th>TotalTime (secs)</th>
+				<th>Number Of Resources</th>
+				<th>BandWidth (Mbps)</th>
+				<th>Duration (secs)</th>
+				<th>BrowserBlock (secs)</th>
+				<th>Latency (secs)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="bw1"></tr>
+				<tr id="bw2"></tr>
+				<tr id="bw3" ></tr>
+			</tbody>
+		</table>
 
 	<b>*</b> Intercepts all the  HTTP requests  made by javascript ( not including browser initiated requests) in the front end code and does a calculation of bandwidth.
 	  However, the time taken in this case is inclusive of queue time, latency, server processing time etc etc

@@ -50,28 +50,13 @@ let postMessageToServiceWorker = (msg) => {
     }
 }
 
-
-
-// document.addEventListener('CUST_CONTENT_LOADED', function(e){
-//         e.preventDefault();
-//       let data =  performance.getEntriesByType('resource').map(resource => {
-//                         return {
-//                             name: resource.name,
-//                             transferSize : resource.transferSize,
-//                             responseEnd : resource.responseEnd,
-//                             responseStart : resource.responseStart
-//                         }
-//         })
-//         postMessageToServiceWorker({ name: 'CONTENT_LOADED',data})
-// },false)
-
 Events.on('LOAD', function(){
      postMessageToServiceWorker({name: 'RELOAD_INIT'})
 })
 
 Events.on('READY', function(){
       let data =  performance.getEntriesByType('resource').map(resource => {
-        console.log(resource)
+        // console.log(resource)
                         return {
                             name: resource.name,
                             transferSize : resource.transferSize,

@@ -24,7 +24,7 @@ RequestInterceptor.prototype  =  {
     constructor: RequestInterceptor,
     initialize : function(time) {
         this.mapOfResponseSizeByResource =  {};
-        // performance.mark({entryType:'mark',name:'BW'})
+         performance.clearResourceTimings()
         if( typeof time != 'undefined' ){
             
             this.timeout  = setTimeout(() => {
@@ -39,16 +39,19 @@ RequestInterceptor.prototype  =  {
     _processResourceData : function(resources){
         resources =  resources || performance.getEntriesByType('resource') ;
         let resourceVal =  resources.map( resource => {
-            // console.log(this.mapOfResponseSizeByResource[resource.name] , resource.name)
+            let totalSize =  resource.transferSize || parseInt(this.mapOfResponseSizeByResource[resource.name]),
+                totalTime =  resource.responseEnd - resource.responseStart
                 return {
-                      totalSize : resource.transferSize || parseInt(this.mapOfResponseSizeByResource[resource.name]),
-                      totalTime : resource.responseEnd - resource.responseStart,
+                      totalSize,
+                      totalTime, 
                       browserBlock : resource.requestStart - resource.startTime,
                       latency      : resource.responseStart - resource.requestStart,
-                      duration : resource.duration
+                      duration : resource.duration,
+                      digBW :  totalSize/totalTime,
+                      startTime: resource.startTime
+
                 }
         })
-        performance.clearResourceTimings()
         return resourceVal.filter( (resource) =>{
             return resource.totalTime > 0 && resource.totalSize >0
         })
