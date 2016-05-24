@@ -49,7 +49,7 @@ let calculateBandWidth =  function(data,ele){
             browserBlock += parseInt(res.browserBlock);
             latency   += parseInt(res.latency)
             res.startTime  = res.startTime || 0
-             console.log(`Bandwidth is ${res.totalSize*8*1000/(1024*1024* res.totalTime).toFixed(2)} at ${res.startTime.toFixed(2)} ms`)
+             console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} at ${res.startTime.toFixed(2)} ms`)
     	})
     }else{
     	throw new Error(`${typeof data} type is not handled for calculation of bandwidth`)
