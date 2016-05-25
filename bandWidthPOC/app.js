@@ -4,9 +4,31 @@ let map =  {
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
 }
 
-let getElementById = (selector) => {
-	return document.getElementById(selector)
-}    
+let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
+    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 0.4;
+
+let getElementById = (ele) => {
+    return document.getElementById(ele)
+}
+
+getElementById('slider1').addEventListener('change', function(e){
+        LEFT_FACTOR  = e.target.value;
+        localStorage.setItem('LEFT_FACTOR',LEFT_FACTOR);
+        getElementById('labelForslider1').innerHTML = LEFT_FACTOR
+})
+
+getElementById('slider2').addEventListener('change', function(e){
+        RIGHT_FACTOR  = e.target.value;
+        localStorage.setItem('RIGHT_FACTOR',RIGHT_FACTOR)
+        getElementById('labelForslider2').innerHTML = RIGHT_FACTOR
+})
+
+getElementById('slider1').value = LEFT_FACTOR;
+getElementById('slider2').value = RIGHT_FACTOR;
+getElementById('labelForslider1').innerHTML = LEFT_FACTOR
+getElementById('labelForslider2').innerHTML = RIGHT_FACTOR
+
+  
 let getTemplate  =  (data)=>{
     var text =  map[data.ele]
     return `<td>${text}</td>
@@ -15,6 +37,7 @@ let getTemplate  =  (data)=>{
             <td>${data.length}</td>
             <td>${data.bandwidth}</td>
             <td>${data.bandWidth_GM}</td>
+            <td>${data.rubbishBW}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
             <td>${data.latency}</td>`
@@ -32,6 +55,25 @@ let numberTemplate  =  (val) => {
 }
 
 
+let filterData  = (bandWidthArr) =>{
+    // console.log(bandWidthArr)
+    bandWidthArr.sort(function(a,b){
+        return parseFloat(a) -  parseFloat(b)
+    })
+    // console.log(bandWidthArr)
+    var filteringFactor  = 0.4
+    let len =  bandWidthArr.length;
+    var minIndex = LEFT_FACTOR,
+        maxIndex =  Math.floor(len*(RIGHT_FACTOR )); 
+    bandWidthArr = bandWidthArr.slice(minIndex, maxIndex)
+        let bwSum =  0;
+        for ( let i =0; i < bandWidthArr.length ; i++){
+                bwSum += bandWidthArr[i]
+        }
+
+    return (bwSum/(maxIndex - minIndex-1)).toFixed(2)
+}
+
 
 
 
@@ -41,7 +83,8 @@ let calculateBandWidth =  function(data,ele){
         duration  = 0,
         browserBlock = 0,
         latency =  0,
-        bandWidth_GM =  1
+        bandWidth_GM =  1;
+        var bandWidthArr =  [];
 
     if( Array.isArray(data)){
     	data.forEach( (res) => {
@@ -52,22 +95,26 @@ let calculateBandWidth =  function(data,ele){
             latency   += parseInt(res.latency)
             res.startTime  = res.startTime || 0;
             bandWidth_GM *= res.totalSize*8*1000/(1024*1024* res.totalTime)
-            console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} Mbps at ${res.startTime.toFixed(2)} ms`)
+            bandWidthArr.push(parseFloat((res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)))
+            // console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} Mbps at ${res.startTime.toFixed(2)} ms`)
     	})
     }else{
     	throw new Error(`${typeof data} type is not handled for calculation of bandwidth`)
     }
+
         totalSize  = (totalSize/(1024*1024)).toFixed(2); 
         totalTime  = totalTime/1000;
         duration  = duration/1000;
         browserBlock  =  browserBlock/1000;
         latency  =  latency/1000;
-        bandWidth_GM  = (Math.pow(bandWidth_GM, 1/data.length)).toFixed(2)
+        bandWidth_GM  = (Math.pow(bandWidth_GM, 1/data.length)).toFixed(2),
+        rubbishBW  = filterData(bandWidthArr);
+
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
  	var bandwidth =   (totalSize*8/totalTime).toFixed(2)
  	console.log(`bandwidth calculated ${bandwidth}`);
- 	
+
 
     var template = getTemplate({
         bandwidth,
@@ -78,7 +125,8 @@ let calculateBandWidth =  function(data,ele){
         latency,
         length : data.length,
         ele,
-        bandWidth_GM
+        bandWidth_GM,
+        rubbishBW
     })
 
     getElementById(ele).innerHTML = template

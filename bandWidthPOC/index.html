@@ -35,6 +35,37 @@
 		label{
 			text-align: center;
 		}
+
+		/*
+		 * Copied from someplace
+		*/
+		output { 
+		  position: absolute;
+		  background-image: linear-gradient(top, #444444, #999999);
+		  width: 40px; 
+		  height: 30px; 
+		  text-align: center; 
+		  color: white; 
+		  border-radius: 10px; 
+		  display: inline-block; 
+		  font: bold 15px/30px Georgia;
+		  bottom: 175%;
+		  left: 0;
+		  margin-left: -1%;
+		}
+		output:after { 
+		  content: "";
+		  position: absolute;
+		  width: 0;
+		  height: 0;
+		  border-top: 10px solid #999999;
+		  border-left: 5px solid transparent;
+		  border-right: 5px solid transparent;
+		  top: 100%;
+		  left: 50%;
+		  margin-left: -5px;
+		  margin-top: -1px;
+		}
 	</style>
 </head>
 <body>
@@ -56,6 +87,22 @@
 					
 				</td>
 			</tr>
+			<tr>
+				<td>Low Pass Filtering Index</td>
+				<td>
+					<span id='labelForslider1'></span>
+					<input id="slider1" name='slider1' type="range" min="0" max="1" step="0.01" />
+				</td>
+				
+			</tr>
+			<tr>
+				<td>High Pass Filtering Index</td>
+				<td>
+					<span id='labelForslider2'></span>
+					<input id="slider2" name='slider2' type="range" min="0" max="1" step="0.01" />
+				</td>
+
+			</tr>
 		</tbody>
 		</table>
 	</div>
@@ -69,6 +116,7 @@
 				<th>Number Of Resources</th>
 				<th>BandWidth (Mbps) ( total_size/ total_download_time)</th>
 				<th>BandWidth (Mbps) ( GM of bandWidths)</th>
+				<th>BandWidth (Mbps) ( Rubbish Data Points)</th>
 				<th>Duration (secs)</th>
 				<th>BrowserBlock (secs)</th>
 				<th>Latency (secs)</th>
