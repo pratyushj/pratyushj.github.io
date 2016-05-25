@@ -61,11 +61,12 @@ let filterData  = (bandWidthArr) =>{
         return parseFloat(a) -  parseFloat(b)
     })
     // console.log(bandWidthArr)
-    var filteringFactor  = 0.4
     let len =  bandWidthArr.length;
     var minIndex = LEFT_FACTOR,
         maxIndex =  Math.floor(len*(RIGHT_FACTOR )); 
-    bandWidthArr = bandWidthArr.slice(minIndex, maxIndex)
+    bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
+    console.log(bandWidthArr)
+    console.log('maxIndex', maxIndex, 'minIndex', minIndex)
         let bwSum =  0;
         for ( let i =0; i < bandWidthArr.length ; i++){
                 bwSum += bandWidthArr[i]
