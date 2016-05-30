@@ -45,8 +45,8 @@ let getTemplate  =  (data)=>{
 
 let optionTemplate =  (val)=>{
     return `<select id='requestOptionID' value='${val}'>
-                    <option selected='${val?'selected':''}' value='true'>Parallel Request</option>
-                    <option selected='${!val?'selected':''}' value='false'>Sequential Request</option>
+                    <option ${val == true ?'selected':''} value='true'>Parallel Request</option>
+                    <option ${val == false ?'selected':''} value='false'>Sequential Request</option>
             </select>`
 }
 
