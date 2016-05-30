@@ -226,7 +226,7 @@ function processXMLResponse(req, index) {
 
 
 let init  = ()=>{
-    PARALLEL_REQUESTS = localStorage.getItem('PARALLEL_REQUESTS') || PARALLEL_REQUESTS
+    PARALLEL_REQUESTS = ( localStorage.getItem('PARALLEL_REQUESTS')  == 'true' ) || PARALLEL_REQUESTS
 
     getElementById('optionContainer').innerHTML =  optionTemplate(PARALLEL_REQUESTS)
 
