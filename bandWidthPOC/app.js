@@ -5,7 +5,7 @@ let map =  {
 }
 
 let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
-    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 0.4;
+    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1;
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
@@ -156,7 +156,7 @@ var BASE_URL = './' ,
     URI = ['128481', '128482','128483','128484','128485','128486','128487','128488','128489','128490'],
     EXT = '.jpg',
     NO_OF_DATA_POINTS = localStorage.getItem('NO_OF_DATA_POINTS') ||  URI.length,
-    PARALLEL_REQUESTS = localStorage.getItem('PARALLEL_REQUESTS') || false;
+    PARALLEL_REQUESTS = (localStorage.getItem('PARALLEL_REQUESTS')  == 'true' )|| false;
 
     URI = URI.map(function (uri) {
         return BASE_URL +STATIC_URI+ uri + EXT
