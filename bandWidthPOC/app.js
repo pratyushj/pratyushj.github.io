@@ -233,7 +233,7 @@ let init  = ()=>{
     getElementById('numberContainer').innerHTML =  numberTemplate(NO_OF_DATA_POINTS)
 
     getElementById('requestOptionID').addEventListener('change',function(){
-            PARALLEL_REQUESTS =   getElementById('requestOptionID').value || false;
+            PARALLEL_REQUESTS =   getElementById('requestOptionID').value == 'true' || false;
             localStorage.setItem('PARALLEL_REQUESTS', PARALLEL_REQUESTS);
             postInit()
     })
