@@ -1,6 +1,6 @@
 let map =  {
     'bw1':'Bandwidth Method I (Round Time in Front End) *',
-    'bw2':'Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **',
+    'bw2':'<strong>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</strong>',
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
 }
 
@@ -31,12 +31,12 @@ getElementById('labelForslider2').innerHTML = RIGHT_FACTOR
   
 let getTemplate  =  (data)=>{
     var text =  map[data.ele]
+    // <td>${data.bandWidth_GM}</td>
     return `<td>${text}</td>
             <td>${data.totalSize}</td>
             <td>${data.totalTime}</td>
             <td>${data.length}</td>
             <td>${data.bandwidth}</td>
-            <td>${data.bandWidth_GM}</td>
             <td>${data.bandWidth_AM}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
@@ -44,7 +44,7 @@ let getTemplate  =  (data)=>{
 }
 
 let optionTemplate =  (val)=>{
-    return `<select id='requestOptionID' value='${val}'>
+    return `<select id='requestOptionID' class='option' value='${val}'>
                     <option ${val == true ?'selected':''} value='true'>Parallel Request</option>
                     <option ${val == false ?'selected':''} value='false'>Sequential Request</option>
             </select>`

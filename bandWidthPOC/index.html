@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Bandwidth POC</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 	<style>
 		.bwTable{
 			text-align: center;
@@ -12,7 +13,7 @@
 			position: absolute;
 			left: 0%;
 			width: 100%;
-			top: 10%;
+			top: 5%;
 			font-size: 20px;
 		}
 		table,th,td{
@@ -27,22 +28,25 @@
 		#bwContainer {
 			display: none;
 			position: relative;
-			left: 20%;
-			width: 50%;
+			left: 0%;
+			width: 40%;
 			top: 10%;
-			font-size: 20px;
+			font-size: 16px;
 		}
 		label{
 			text-align: center;
+		}
+		#ctrlPanel {
+			width:20%;
 		}
 	</style>
 </head>
 <body>
 
 <div id='container' class="container">
-	<div id="ctrlPanel">
-	<label>Control Panel</label>
-		<table>
+	<div id="ctrlPanel" class="text-center">
+	<label class='text-center'>Control Panel</label>
+		<table class="table table-bordered">
 		<tbody>
 			<tr>
 				<td>Request Type</td>
@@ -76,7 +80,7 @@
 		</table>
 	</div>
 	<div id="bwContainer">
-		<table class="bwTable">
+		<table class="bwTable table table-bordered table-striped">
 			<thead>
 				<tr>
 				<th>Method</th>
@@ -84,7 +88,7 @@
 				<th>TotalTime (secs)</th>
 				<th>Number Of Resources</th>
 				<th>BandWidth (Mbps) ( total_size/ total_download_time)</th>
-				<th>BandWidth (Mbps) ( GM of bandWidths)</th>
+				<!-- <th>BandWidth (Mbps) ( GM of bandWidths)</th> -->
 				<th>BandWidth (Mbps) ( AM of bandWidths)</th>
 				<th>Duration (secs)</th>
 				<th>BrowserBlock (secs)</th>
