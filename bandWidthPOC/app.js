@@ -5,7 +5,7 @@ let map =  {
 }
 
 let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
-    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1;
+    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0;
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
@@ -37,7 +37,7 @@ let getTemplate  =  (data)=>{
             <td>${data.length}</td>
             <td>${data.bandwidth}</td>
             <td>${data.bandWidth_GM}</td>
-            <td>${data.rubbishBW}</td>
+            <td>${data.bandWidth_AM}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
             <td>${data.latency}</td>`
@@ -56,14 +56,12 @@ let numberTemplate  =  (val) => {
 
 
 let filterData  = (bandWidthArr) =>{
-    // console.log(bandWidthArr)
     bandWidthArr.sort(function(a,b){
         return parseFloat(a) -  parseFloat(b)
     })
-    // console.log(bandWidthArr)
     let len =  bandWidthArr.length;
-    var minIndex = LEFT_FACTOR,
-        maxIndex =  Math.floor(len*(RIGHT_FACTOR )); 
+    var minIndex = Math.floor(len*LEFT_FACTOR),
+        maxIndex =  Math.floor(len*(RIGHT_FACTOR)); 
     bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
     console.log(bandWidthArr)
     console.log('maxIndex', maxIndex, 'minIndex', minIndex)
@@ -72,11 +70,17 @@ let filterData  = (bandWidthArr) =>{
                 bwSum += bandWidthArr[i]
         }
 
-    return (bwSum/(maxIndex - minIndex-1)).toFixed(2)
+    return (bwSum/(maxIndex - minIndex)).toFixed(2)
 }
 
 
+let addMbpsFactor = (val, factor) =>{
+    return (val*factor).toFixed(2)
+}
 
+let convertMsToSeconds  = (val) =>{
+    return val/1000;
+}
 
 let calculateBandWidth =  function(data,ele){
 	var totalSize = 0,
@@ -85,31 +89,34 @@ let calculateBandWidth =  function(data,ele){
         browserBlock = 0,
         latency =  0,
         bandWidth_GM =  1;
-        var bandWidthArr =  [];
+        var bandWidthArr =  [],
+            factor =  (8*1000)/ (1024*1024),
+            bandWidth_AM;
 
     if( Array.isArray(data)){
     	data.forEach( (res) => {
-    		totalTime +=  parseInt(res.totalTime);
-    		totalSize += parseInt(res.totalSize);
-            duration  += parseInt(res.duration);
-            browserBlock += parseInt(res.browserBlock);
-            latency   += parseInt(res.latency)
+    		totalTime +=  parseInt(res.totalTime); // responseEnd - requestStart
+    		totalSize += parseInt(res.totalSize);  // size
+            duration  += parseInt(res.duration);   // duration
+            browserBlock += parseInt(res.browserBlock); // requestStart - startTime
+            latency   += parseInt(res.latency)          // responseStart - requestStart
             res.startTime  = res.startTime || 0;
-            bandWidth_GM *= res.totalSize*8*1000/(1024*1024* res.totalTime)
-            bandWidthArr.push(parseFloat((res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)))
+            bandWidth_GM *= res.totalSize/res.totalTime // Geometric Mean of 
+            bandWidthArr.push(parseFloat(res.totalSize/res.totalTime));
             // console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} Mbps at ${res.startTime.toFixed(2)} ms`)
     	})
     }else{
     	throw new Error(`${typeof data} type is not handled for calculation of bandwidth`)
     }
 
+
         totalSize  = (totalSize/(1024*1024)).toFixed(2); 
-        totalTime  = totalTime/1000;
-        duration  = duration/1000;
-        browserBlock  =  browserBlock/1000;
-        latency  =  latency/1000;
-        bandWidth_GM  = (Math.pow(bandWidth_GM, 1/data.length)).toFixed(2),
-        rubbishBW  = filterData(bandWidthArr);
+        totalTime  = convertMsToSeconds(totalTime);
+        duration  = convertMsToSeconds(duration);
+        browserBlock  =  convertMsToSeconds(browserBlock);
+        latency  =  convertMsToSeconds(latency);
+        bandWidth_GM  = addMbpsFactor(Math.pow(bandWidth_GM, 1/data.length) , factor ),
+        bandWidth_AM  = addMbpsFactor(filterData(bandWidthArr), factor);
 
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
@@ -127,7 +134,7 @@ let calculateBandWidth =  function(data,ele){
         length : data.length,
         ele,
         bandWidth_GM,
-        rubbishBW
+        bandWidth_AM
     })
 
     getElementById(ele).innerHTML = template
@@ -155,7 +162,7 @@ var BASE_URL = './' ,
     STATIC_URI = 'images/',
     URI = ['128481', '128482','128483','128484','128485','128486','128487','128488','128489','128490'],
     EXT = '.jpg',
-    NO_OF_DATA_POINTS = localStorage.getItem('NO_OF_DATA_POINTS') ||  URI.length,
+    NO_OF_DATA_POINTS = localStorage.getItem('NO_OF_DATA_POINTS') ||  25,
     PARALLEL_REQUESTS = (localStorage.getItem('PARALLEL_REQUESTS')  == 'true' )|| false;
 
     URI = URI.map(function (uri) {
@@ -276,8 +283,6 @@ let postInit = () =>{
     if ( extraEntries > 0 ){
         URI = URI.concat(URI.slice(0, extraEntries))
     }
-    // console.log(URI)
-   
 
     clearTables()
 

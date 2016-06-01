@@ -35,37 +35,6 @@
 		label{
 			text-align: center;
 		}
-
-		/*
-		 * Copied from someplace
-		*/
-		output { 
-		  position: absolute;
-		  background-image: linear-gradient(top, #444444, #999999);
-		  width: 40px; 
-		  height: 30px; 
-		  text-align: center; 
-		  color: white; 
-		  border-radius: 10px; 
-		  display: inline-block; 
-		  font: bold 15px/30px Georgia;
-		  bottom: 175%;
-		  left: 0;
-		  margin-left: -1%;
-		}
-		output:after { 
-		  content: "";
-		  position: absolute;
-		  width: 0;
-		  height: 0;
-		  border-top: 10px solid #999999;
-		  border-left: 5px solid transparent;
-		  border-right: 5px solid transparent;
-		  top: 100%;
-		  left: 50%;
-		  margin-left: -5px;
-		  margin-top: -1px;
-		}
 	</style>
 </head>
 <body>
@@ -87,7 +56,7 @@
 					
 				</td>
 			</tr>
-			<tr>
+			<tr style="display:none">
 				<td>Low Pass Filtering Index</td>
 				<td>
 					<span id='labelForslider1'></span>
@@ -95,7 +64,7 @@
 				</td>
 				
 			</tr>
-			<tr>
+			<tr style="display:none">
 				<td>High Pass Filtering Index</td>
 				<td>
 					<span id='labelForslider2'></span>
@@ -116,7 +85,7 @@
 				<th>Number Of Resources</th>
 				<th>BandWidth (Mbps) ( total_size/ total_download_time)</th>
 				<th>BandWidth (Mbps) ( GM of bandWidths)</th>
-				<th>BandWidth (Mbps) ( Rubbish Data Points)</th>
+				<th>BandWidth (Mbps) ( AM of bandWidths)</th>
 				<th>Duration (secs)</th>
 				<th>BrowserBlock (secs)</th>
 				<th>Latency (secs)</th>
@@ -135,6 +104,14 @@
 	<br/>
 	<b>**</b> Intercepts all the HTTP Requests made in the webapp ( including browser initiated requests) at the Service Worker Layer. The time taken for calculation is only the
 			   time for which the content is downloaded (responseEnd - responseStart). So, it should be more precise
+
+	<p>
+	 <b>Duration</b> : It is the sum of duration taken for each request (i.e. responseEnd - startTime)</br>
+	 <b>TotalSize</b>: Sum of resource sizes being transferred</br>
+	 <b>TotalTime</b>: It is the sum of effective time taken for each request ( i.e. (responseEnd - requestStart))</br>
+	 <b>BrowserBlock</b>: It is the sum of time each request has been stalled by the browser due to primarily multiple requests being sent simultaneously.</br>
+	 <b>Latency</b> : It is sum of round trip time from sending request to receiving first byte of response</br>
+	</p>		   
 </div>
 <div id="bwLoader" >
 	<p>Please Wait While We Display Bandwidth Details  ...</p>
