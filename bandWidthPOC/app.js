@@ -88,10 +88,10 @@ let calculateBandWidth =  function(data,ele){
         duration  = 0,
         browserBlock = 0,
         latency =  0,
-        bandWidth_GM =  1;
-        var bandWidthArr =  [],
-            factor =  (8*1000)/ (1024*1024),
-            bandWidth_AM;
+        bandWidth_GM =  1,
+        bandWidthArr =  [],
+        factor =  (8*1000)/ (1024*1024),
+        bandWidth_AM;
 
     if( Array.isArray(data)){
     	data.forEach( (res) => {
@@ -115,7 +115,7 @@ let calculateBandWidth =  function(data,ele){
         duration  = convertMsToSeconds(duration);
         browserBlock  =  convertMsToSeconds(browserBlock);
         latency  =  convertMsToSeconds(latency);
-        bandWidth_GM  = addMbpsFactor(Math.pow(bandWidth_GM, 1/data.length) , factor ),
+        bandWidth_GM  = addMbpsFactor(Math.pow(bandWidth_GM, 1/data.length) , factor );
         bandWidth_AM  = addMbpsFactor(filterData(bandWidthArr), factor);
 
 
@@ -257,7 +257,7 @@ let init  = ()=>{
 window.addEventListener('load', function(e){
         init();
         postInit();
-         Events.emit('LOAD')
+        
 })
 
 
@@ -272,7 +272,7 @@ let clearTables =  ()=>{
 
 
 let postInit = () =>{
-
+    Events.emit('LOAD')
     let numOfIterations =  Math.floor(NO_OF_DATA_POINTS/URI.length);
     let extraEntries =  NO_OF_DATA_POINTS%URI.length
 

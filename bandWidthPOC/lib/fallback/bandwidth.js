@@ -32,7 +32,8 @@
         };
 
         Events.on('READY', function(){
-            Events.emit('BW_FALLBACK', bandWidthCache)
+            Events.emit('BW_FALLBACK', bandWidthCache.slice())
+            bandWidthCache =  [];
         })
 
 
