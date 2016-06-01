@@ -1,7 +1,18 @@
 let map =  {
     'bw1':'Bandwidth Method I (Round Time in Front End) *',
-    'bw2':'<strong>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</strong>',
+    'bw2':'<strong>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</bold>',
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
+}
+
+var bwBucketMap =  {
+    GPRS : 'GRPS ( 500ms, 50kb/s, 20kb.s)',
+    R2G : 'Regular 2G(300ms, 250kb/s, 50kb/s)',
+    G2G :'Good 2G(150ms, 450kb/s, 150kb/s)',
+    R3G :'Regular 3G(100ms, 750kb/s, 250kb/s)',
+    G3G :'Good 3G(40ms, 1.5Mb/s, 750kb/s)',
+    R4G :'Regular 4G(20ms, 4.0Mb/s, 3.0Mb/s)',
+    DSL :'DSL(5ms, 2.0Mb/s, 1.0Mb/s)',
+    WIFI :'WiFi(2ms, 30Mb/s, 15Mb/s)',
 }
 
 let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
@@ -50,21 +61,31 @@ let optionTemplate =  (val)=>{
             </select>`
 }
 
+let bandWidthOptionTemplate  =  (val)=>{
+     return `<select id='bwOptionID' class='option' value='${val}'>
+            <option>--Select A bandwidth Bucket</option>`+
+                    Object.keys(bwBucketMap).map(key =>{
+                        return `<option ${val == key ?'selected':''} value=${key}>${bwBucketMap[key]}</option>`
+                    })+
+            `</select>`
+}
+
 let numberTemplate  =  (val) => {
     return `<input type='number' id='requestNumID' placeholder="Enter Nunber Of Requests" value='${val}'/>`
 }
 
 
 let filterData  = (bandWidthArr) =>{
-    bandWidthArr.sort(function(a,b){
-        return parseFloat(a) -  parseFloat(b)
-    })
+    //TODO Jave Stopped Sorting
+    // bandWidthArr.sort(function(a,b){
+    //     return parseFloat(a) -  parseFloat(b)
+    // })
     let len =  bandWidthArr.length;
     var minIndex = Math.floor(len*LEFT_FACTOR),
         maxIndex =  Math.floor(len*(RIGHT_FACTOR)); 
-    bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
+    // bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
     console.log(bandWidthArr)
-    console.log('maxIndex', maxIndex, 'minIndex', minIndex)
+    // console.log('maxIndex', maxIndex, 'minIndex', minIndex)
         let bwSum =  0;
         for ( let i =0; i < bandWidthArr.length ; i++){
                 bwSum += bandWidthArr[i]
@@ -137,18 +158,26 @@ let calculateBandWidth =  function(data,ele){
         bandWidth_AM
     })
 
-    getElementById(ele).innerHTML = template
+    getElementById(ele).innerHTML = template;
+    return {
+        arr  : bandWidthArr.map(val=>val*factor),
+        bandwidth
+    };
 };
 
 Events.on('BW_FALLBACK', function(data){
-	calculateBandWidth(data, 'bw1')
+	var bwArr =  calculateBandWidth(data, 'bw1');
+    
+
 })
 Events.on('BW_SW', function(data){
-	calculateBandWidth(data, 'bw2')
+	var bwArr =  calculateBandWidth(data, 'bw2')
+    displayBandwidthChart(bwArr.arr);
+    window.calcBW =  bwArr.bandwidth
 })
 Events.on('BW_SW_RES', function(data){
     calculateBandWidth(data, 'bw3')
-	getElementById('bwContainer').style.display = 'block';
+	getElementById('bwContainer').style.display = 'inline-block';
 	getElementById('bwLoader').style.display =  'none';
 })
 
@@ -239,6 +268,8 @@ let init  = ()=>{
 
     getElementById('numberContainer').innerHTML =  numberTemplate(NO_OF_DATA_POINTS)
 
+    getElementById('bandwidthContainer').innerHTML =  bandWidthOptionTemplate()
+
     getElementById('requestOptionID').addEventListener('change',function(){
             PARALLEL_REQUESTS =   getElementById('requestOptionID').value == 'true' || false;
             localStorage.setItem('PARALLEL_REQUESTS', PARALLEL_REQUESTS);
@@ -250,14 +281,22 @@ let init  = ()=>{
             localStorage.setItem('NO_OF_DATA_POINTS', NO_OF_DATA_POINTS);
             postInit()
     })
+    getElementById('clearBwHistory').addEventListener('click', function(){
+        clearPrevBwData()
+    })
+    getElementById('saveCurrentBW').addEventListener('click', function(){
+        persistCurrentBw()
+    })//
+    getElementById('drawHistoricalBW').addEventListener('click', function(){
+        drawHistoricalGraph()
+    })
 }
 
 
 // on load make a call to fetch assets 
 window.addEventListener('load', function(e){
         init();
-        postInit();
-        
+        postInit();    
 })
 
 
@@ -288,4 +327,174 @@ let postInit = () =>{
 
     fetchStaticAssets()
    
+}
+
+let clearPrevBwData =  ()=>{
+    localStorage.removeItem('bwHistory')
+}
+
+let persistCurrentBw =  ()=>{
+    /**
+        {
+          "GPRS":[0.5,0.6],
+          "G2G":[]  
+        }
+    */
+    let existingData =  localStorage.getItem('bwHistory')
+    try{
+        existingData = JSON.parse(existingData); //should be an object
+        if(typeof existingData != 'object'  && existingData != null){
+            existingData  ={}
+        }
+        var bwType =  getElementById('bwOptionID').value;
+        if(!bwType){
+            alert('no BandWidth bucket selected for making comparisons');
+            return;
+        }
+        if(existingData[bwType]){ // if exists
+            if(!Array.isArray(existingData[bwType])){
+               existingData[bwType] =  [];
+            }
+             existingData[bwType].push(window.calcBW) //TODO get the value 
+        }else{ //if does not exist
+            existingData[bwType] =  [];
+            existingData[bwType].push(window.calcBW) //TODO get the value 
+        }
+        localStorage.setItem('bwHistory', JSON.stringify(existingData))
+    }catch(e){
+        console.log(e);
+        // alert(e.message)
+        if(!bwType)return
+        var history =  `{ "${bwType}": ["${window.calcBW}"]}`;
+        console.log(history)
+        localStorage.setItem('bwHistory',history)
+    }
+    
+}
+let  getRandomColor  =  ()=>{
+  var letters = '0123456789ABCDEF'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+let drawHistoricalGraph = ()=>{
+    var storageData = localStorage.getItem('bwHistory');
+        try{
+            storageData =  JSON.parse(storageData);
+            if( typeof storageData == 'object' && storageData != null){
+
+
+                 var ctx = document.getElementById("bwChart"),
+                     maxLen =  1;
+                 var datasets  =  Object.keys(bwBucketMap).map(val=>{
+                                let data =  storageData[val] || [];
+                                if(data.length > maxLen){
+                                    maxLen = data.length;
+                                }
+                                return {
+                                    fillColor : getRandomColor(),
+                                    strokeColor : getRandomColor(),
+                                    label:bwBucketMap[val],
+                                    data ,
+                                    backgroundColor : 'transparent',
+                                    borderColor: getRandomColor(),
+                                    pointBorderColor: getRandomColor(),
+                                    pointBackgroundColor: getRandomColor(),
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                }
+                         })
+                 var options   =  {
+                    type: 'line',
+                    xLabel: 'Index',
+                    yLabel:'Bandwidth',
+                   
+                    data : {
+                         datasets :datasets  ,
+                         labels: Array.apply(null, new Array(maxLen)).map( (val, idx)=>{return idx+1}),
+                         backgroundColor : 'transparent',
+                    },
+                  
+                    
+                    options: {
+                        responsive :true,
+                        maintainAspectRatio : true,
+                        scales: {
+                            type:'linear',
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero:true
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'BandWidth'
+                                }
+                            }],
+                            xAxes : [{
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Index'
+                                }
+                            }]
+                        }
+                    }
+                };
+                    var myChart = new Chart(ctx,options);
+
+            }else{
+                console.log(`storage type is not object but `, typeof storageData)
+            }
+        }catch(e){
+            console.error(e)
+        }
+
+   
+}
+
+
+let displayBandwidthChart =  (arr)=>{
+    var ctx = document.getElementById("myChart");
+    var options =  {
+    type: 'line',
+   
+    data : {
+         labels: Array.apply(null, new Array(arr.length)).map( (val, idx)=>{return idx+1}),
+         datasets : [{
+            label:'Bandwidth Per Resource',
+            data : arr
+        }],
+    },
+  
+    
+    options: {
+        responsive :true,
+        maintainAspectRatio : true,
+        scales: {
+            type:'linear',
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'BandWidth'
+                }
+            }],
+            xAxes :[{
+               scaleLabel: {
+                    display: true,
+                    labelString: 'Index'
+                } 
+            }]
+        }
+    }
+}
+var myChart = new Chart(ctx, options);
 }

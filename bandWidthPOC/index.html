@@ -26,7 +26,7 @@
 			top: 10%;
 		}
 		#bwContainer {
-			display: none;
+			display: inline-block;
 			position: relative;
 			left: 0%;
 			width: 40%;
@@ -37,7 +37,22 @@
 			text-align: center;
 		}
 		#ctrlPanel {
-			width:20%;
+			width:100%;
+		}
+		#currentDataPoints{
+			width: 50%;
+			height: 50%;
+			position: relative;
+			left:8%;
+			display: inline-block;
+
+		}
+		#bwDataPoints {
+			width: 50%;
+			height: 50%;
+			position: relative;
+			left:5%;
+			display: inline-block;
 		}
 	</style>
 </head>
@@ -53,12 +68,20 @@
 				<td id='optionContainer'>
 				
 				</td>
+				<td>Bandwidth Type</td>
+				<td id='bandwidthContainer'>
+				</td>
 			</tr>
 			<tr>
 				<td>Number Of Requests</td>
-				<td id='numberContainer'>
-					
+				<td id='numberContainer'>	
 				</td>
+				<td><button type='button' class='btn btn-primary' id='saveCurrentBW'>Save This BW Data Point</button></td>
+				<td><button type='button' class='btn btn-danger' id='clearBwHistory'>Clear All The Data Points</button></td>
+			</tr>
+			<tr>
+				<td>Draw Hostorical Bandwidth Graph</td>
+				<td><button type='button' class='btn btn-primary' id='drawHistoricalBW'>Draw Graph</button></td>
 			</tr>
 			<tr style="display:none">
 				<td>Low Pass Filtering Index</td>
@@ -117,11 +140,18 @@
 	 <b>Latency</b> : It is sum of round trip time from sending request to receiving first byte of response</br>
 	</p>		   
 </div>
+<div id='currentDataPoints'>
+<canvas id="myChart" width="400" height="400"></canvas>
+</div>
+<div id='bwDataPoints'>
+<canvas id="bwChart" width="400" height="400"></canvas>
+</div>
 <div id="bwLoader" >
 	<p>Please Wait While We Display Bandwidth Details  ...</p>
 </div>
 </div>
 </body>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.js"></script>
 <script type="text/javascript" src="./lib/Events/Events.js"></script>
 <script src="./lib/fallback/bandwidth.js"></script>
 <script type="text/javascript" src="./app.js"></script>
