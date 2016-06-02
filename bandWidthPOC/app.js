@@ -16,7 +16,8 @@ var bwBucketMap =  {
 }
 
 let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
-    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0;
+    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0, 
+    BW_OPTION_TYPE  = localStorage.getItem('BW_OPTION_TYPE');
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
@@ -262,18 +263,24 @@ function processXMLResponse(req, index) {
 
 
 let init  = ()=>{
-    PARALLEL_REQUESTS = ( localStorage.getItem('PARALLEL_REQUESTS')  == 'true' ) || PARALLEL_REQUESTS
+    PARALLEL_REQUESTS = ( localStorage.getItem('PARALLEL_REQUESTS')  == 'true' ) || PARALLEL_REQUESTS;
+
 
     getElementById('optionContainer').innerHTML =  optionTemplate(PARALLEL_REQUESTS)
 
     getElementById('numberContainer').innerHTML =  numberTemplate(NO_OF_DATA_POINTS)
 
-    getElementById('bandwidthContainer').innerHTML =  bandWidthOptionTemplate()
+    getElementById('bandwidthContainer').innerHTML =  bandWidthOptionTemplate(BW_OPTION_TYPE)
 
     getElementById('requestOptionID').addEventListener('change',function(){
             PARALLEL_REQUESTS =   getElementById('requestOptionID').value == 'true' || false;
             localStorage.setItem('PARALLEL_REQUESTS', PARALLEL_REQUESTS);
             postInit()
+    })
+
+    getElementById('bwOptionID').addEventListener('change', function(){
+        BW_OPTION_TYPE = getElementById('bwOptionID').value || BW_OPTION_TYPE;
+        localStorage.setItem('BW_OPTION_TYPE',BW_OPTION_TYPE)
     })
 
     getElementById('requestNumID').addEventListener('change', function(){
