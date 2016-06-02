@@ -416,6 +416,7 @@ let drawHistoricalGraph = ()=>{
                                     pointHoverBorderWidth: 2,
                                     pointRadius: 1,
                                     pointHitRadius: 10,
+                                    lineTension: 0
                                 }
                          })
                  var options   =  {
@@ -475,7 +476,8 @@ let displayBandwidthChart =  (arr)=>{
          labels: Array.apply(null, new Array(arr.length)).map( (val, idx)=>{return idx+1}),
          datasets : [{
             label:'Bandwidth Per Resource',
-            data : arr
+            data : arr,
+            lineTension:0
         }],
     },
   
