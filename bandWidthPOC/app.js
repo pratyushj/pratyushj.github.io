@@ -1,10 +1,10 @@
-let map =  {
+let displayTextByBWMethod =  {
     'bw1':'Bandwidth Method I (Round Time in Front End) *',
     'bw2':'<strong>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</bold>',
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
-}
+};
 
-var bwBucketMap =  {
+let displayTextByBWBucket =  {
     GPRS : 'GRPS ( 500ms, 50kb/s, 20kb.s)',
     R2G : 'Regular 2G(300ms, 250kb/s, 50kb/s)',
     G2G :'Good 2G(150ms, 450kb/s, 150kb/s)',
@@ -13,16 +13,18 @@ var bwBucketMap =  {
     R4G :'Regular 4G(20ms, 4.0Mb/s, 3.0Mb/s)',
     DSL :'DSL(5ms, 2.0Mb/s, 1.0Mb/s)',
     WIFI :'WiFi(2ms, 30Mb/s, 15Mb/s)',
-}
+};
 
-let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0,
-    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0, 
+let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0, // TODO REMOVE IT
+    RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0, //TODO REMOVE IT
     BW_OPTION_TYPE  = localStorage.getItem('BW_OPTION_TYPE');
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
 }
 
+// TODO REMOVE IT AS SLIDERS NOT BEING USED 
+// *1
 getElementById('slider1').addEventListener('change', function(e){
         LEFT_FACTOR  = e.target.value;
         localStorage.setItem('LEFT_FACTOR',LEFT_FACTOR);
@@ -40,9 +42,14 @@ getElementById('slider2').value = RIGHT_FACTOR;
 getElementById('labelForslider1').innerHTML = LEFT_FACTOR
 getElementById('labelForslider2').innerHTML = RIGHT_FACTOR
 
+// *1 ENDS HERE
   
+  /**
+  *  Template for row of the table   
+  *
+  */
 let getTemplate  =  (data)=>{
-    var text =  map[data.ele]
+    var text =  displayTextByBWMethod[data.ele]
     // <td>${data.bandWidth_GM}</td>
     return `<td>${text}</td>
             <td>${data.totalSize}</td>
@@ -54,58 +61,76 @@ let getTemplate  =  (data)=>{
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
             <td>${data.latency}</td>`
-}
+};
 
+/**
+* Template for option of Request Types
+*/
 let optionTemplate =  (val)=>{
     return `<select id='requestOptionID' class='option' value='${val}'>
                     <option ${val == true ?'selected':''} value='true'>Parallel Request</option>
                     <option ${val == false ?'selected':''} value='false'>Sequential Request</option>
             </select>`
-}
+};
 
+/**
+* Template for option of BandWidth Types
+*/
 let bandWidthOptionTemplate  =  (val)=>{
      return `<select id='bwOptionID' class='option' value='${val}'>
             <option>--Select A bandwidth Bucket</option>`+
-                    Object.keys(bwBucketMap).map(key =>{
-                        return `<option ${val == key ?'selected':''} value=${key}>${bwBucketMap[key]}</option>`
+                    Object.keys(displayTextByBWBucket).map(key =>{
+                        return `<option ${val == key ?'selected':''} value=${key}>${displayTextByBWBucket[key]}</option>`
                     })+
             `</select>`
 }
+
+/**
+* Template for input field for Number Of Requests
+*/
 
 let numberTemplate  =  (val) => {
     return `<input type='number' id='requestNumID' placeholder="Enter Nunber Of Requests" value='${val}'/>`
 }
 
+/**
+* Sorts the data and trims it on both side based on the LEFT_FACTOR and RIGHT_FACTOR
+*/
+let filterData  = (arr) =>{
 
-let filterData  = (bandWidthArr) =>{
-    //TODO Jave Stopped Sorting
-    // bandWidthArr.sort(function(a,b){
-    //     return parseFloat(a) -  parseFloat(b)
-    // })
-    let len =  bandWidthArr.length;
-    var minIndex = Math.floor(len*LEFT_FACTOR),
-        maxIndex =  Math.floor(len*(RIGHT_FACTOR)); 
-    // bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
-    console.log(bandWidthArr)
-    // console.log('maxIndex', maxIndex, 'minIndex', minIndex)
-        let bwSum =  0;
-        for ( let i =0; i < bandWidthArr.length ; i++){
-                bwSum += bandWidthArr[i]
-        }
+    let bandWidthArr =  arr.slice(),
+        len =  bandWidthArr.length,
+        minIndex = Math.floor(len*LEFT_FACTOR),
+        maxIndex =  Math.floor(len*(RIGHT_FACTOR)),
+        bwSum =  0;
+   
+    bandWidthArr.sort(function(a,b){
+        return parseFloat(a) -  parseFloat(b)
+    })
+    
+    bandWidthArr = bandWidthArr.slice(minIndex, maxIndex);
+
+    for ( let i =0; i < bandWidthArr.length ; i++){
+            bwSum += bandWidthArr[i]
+    }
 
     return (bwSum/(maxIndex - minIndex)).toFixed(2)
 }
 
-
+// adds a factor ideally used for converting the bytes per milisecond to MegaBitsPerSecond
 let addMbpsFactor = (val, factor) =>{
     return (val*factor).toFixed(2)
 }
 
+// Convert Milliseconds to Seconds
 let convertMsToSeconds  = (val) =>{
     return val/1000;
 }
 
-let calculateBandWidth =  function(data,ele){
+/**
+* Calculates the bandwidth related data
+*/
+let calculateBandWidth =  function(data){
 	var totalSize = 0,
         totalTime = 0,
         duration  = 0,
@@ -119,9 +144,10 @@ let calculateBandWidth =  function(data,ele){
         bandWidth_AM;
 
     if( Array.isArray(data)){
+
     	data.forEach( (res) => {
     		totalTime +=  parseInt(res.totalTime); // responseEnd - requestStart
-            totalDownloadTime += parseInt(res.downloadTime);
+            totalDownloadTime += parseInt(res.downloadTime); // downloadTime
     		totalSize += parseInt(res.totalSize);  // size
             duration  += parseInt(res.duration);   // duration
             browserBlock += parseInt(res.browserBlock); // requestStart - startTime
@@ -130,8 +156,8 @@ let calculateBandWidth =  function(data,ele){
             bandWidth_GM *= res.totalSize/res.totalTime // Geometric Mean of 
             bandWidthArr.push(parseFloat(res.totalSize/res.totalTime));
             downloadArr.push(parseFloat(res.totalSize/res.downloadTime));
-            // console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} Mbps at ${res.startTime.toFixed(2)} ms`)
     	})
+
     }else{
     	throw new Error(`${typeof data} type is not handled for calculation of bandwidth`)
     }
@@ -152,8 +178,9 @@ let calculateBandWidth =  function(data,ele){
          download  = (totalSize*8/totalDownloadTime).toFixed(2);
  	console.log(`bandwidth calculated ${bandwidth}`);
 
-
-    var template = getTemplate({
+    return {
+        arr  : bandWidthArr.map(val=>val*factor),
+        downloadArray : downloadArr.map( val => val*factor),
         bandwidth,
         download,
         totalSize,
@@ -162,35 +189,12 @@ let calculateBandWidth =  function(data,ele){
         browserBlock,
         latency,
         length : data.length,
-        ele,
         bandWidth_GM,
         bandWidth_AM
-    })
-
-    getElementById(ele).innerHTML = template;
-    return {
-        arr  : bandWidthArr.map(val=>val*factor),
-        downloadArray : downloadArr.map( val => val * factor),
-        bandwidth
     };
 };
 
-Events.on('BW_FALLBACK', function(data){
-	var bwArr =  calculateBandWidth(data, 'bw1');
-    
 
-})
-Events.on('BW_SW', function(data){
-	var bwArr =  calculateBandWidth(data, 'bw2')
-    displayBandwidthChart(bwArr.arr);
-    window.calcBW =  bwArr.bandwidth;
-    displayBandwidthChart(bwArr.downloadArray, getElementById('downloadChart'));
-})
-Events.on('BW_SW_RES', function(data){
-    calculateBandWidth(data, 'bw3')
-	getElementById('bwContainer').style.display = 'inline-block';
-	getElementById('bwLoader').style.display =  'none';
-})
 
 
 /**
@@ -271,7 +275,9 @@ function processXMLResponse(req, index) {
 }
 
 
-
+/**
+* called on initialization. Does the binding of event listener and initial population of input parameters in control panel
+*/
 let init  = ()=>{
     PARALLEL_REQUESTS = ( localStorage.getItem('PARALLEL_REQUESTS')  == 'true' ) || PARALLEL_REQUESTS;
 
@@ -307,6 +313,24 @@ let init  = ()=>{
     getElementById('drawHistoricalBW').addEventListener('click', function(){
         drawHistoricalGraph()
     })
+
+    // Events binding on the action raised after XMLHttpRequest method
+    Events.on('BW_FALLBACK', function(data){
+        var bwArr =  addBandwidthToTable(data, 'bw1');
+    })
+    // Event Binding on Bandwidth I ( Service Worker + Request)
+    Events.on('BW_SW', function(data){
+        var val =  addBandwidthToTable(data, 'bw2')
+        displayBandwidthChart(val.arr, getElementById("myChart"));
+        window.calcBW =  val.bandwidth;
+        displayBandwidthChart(val.downloadArray, getElementById('downloadChart'));
+    })
+    // Event Binding on Bandwidth II
+    Events.on('BW_SW_RES', function(data){
+        addBandwidthToTable(data, 'bw3')
+        getElementById('bwContainer').style.display = 'inline-block';
+        getElementById('bwLoader').style.display =  'none';
+    })
 }
 
 
@@ -316,7 +340,27 @@ window.addEventListener('load', function(e){
         postInit();    
 })
 
+let addBandwidthToTable  = (data, ele) =>{
+    var val =  calculateBandWidth(data);
+    getElementById(ele).innerHTML =  getTemplate({
+        bandwidth : val.bandwidth,
+        download  : val.download,
+        totalSize : val.totalSize,
+        totalTime : val.totalTime,
+        duration  : val.duration,
+        browserBlock : val.browserBlock,
+        latency : val.latency,
+        length : val.length,
+        bandWidth_GM : val.bandWidth_GM,
+        bandWidth_AM : val.bandWidth_AM,
+        ele
+    })
+    return val;
+}
 
+/**
+* Clears the body of the table 
+*/
 let clearTables =  ()=>{
 
     var arr = ['bw1', 'bw2', 'bw3'];
@@ -326,7 +370,9 @@ let clearTables =  ()=>{
     })
 }
 
-
+/**
+*  postInit clears the table, and fetchStaticAssets makes fresh network calls based on the number of data points 
+*/
 let postInit = () =>{
     Events.emit('LOAD')
     let numOfIterations =  Math.floor(NO_OF_DATA_POINTS/URI.length);
@@ -346,17 +392,18 @@ let postInit = () =>{
    
 }
 
+/**
+* Clears the historically persisted bandwidth details. Should be called on action on clear all data button
+*/
 let clearPrevBwData =  ()=>{
     localStorage.removeItem('bwHistory')
 }
 
+/**
+* Persist the current bandwidth value against the currently selected bandwidth bucket
+*/
 let persistCurrentBw =  ()=>{
-    /**
-        {
-          "GPRS":[0.5,0.6],
-          "G2G":[]  
-        }
-    */
+
     let existingData =  localStorage.getItem('bwHistory')
     try{
         existingData = JSON.parse(existingData); //should be an object
@@ -365,7 +412,7 @@ let persistCurrentBw =  ()=>{
         }
         var bwType =  getElementById('bwOptionID').value;
         if(!bwType){
-            alert('no BandWidth bucket selected for making comparisons');
+            alert('No BandWidth bucket selected for making comparisons');
             return;
         }
         if(existingData[bwType]){ // if exists
@@ -388,6 +435,10 @@ let persistCurrentBw =  ()=>{
     }
     
 }
+
+/**
+* Returns a random color code every time it gets called
+*/
 let  getRandomColor  =  ()=>{
   var letters = '0123456789ABCDEF'.split('');
   var color = '#';
@@ -396,16 +447,22 @@ let  getRandomColor  =  ()=>{
   }
   return color;
 }
+
+/**
+* Draws the historical (persisted) bandwidth saved against the bandwidth bucket
+*/
 let drawHistoricalGraph = ()=>{
-    var storageData = localStorage.getItem('bwHistory');
+    let storageData = localStorage.getItem('bwHistory');
         try{
+
             storageData =  JSON.parse(storageData);
+
             if( typeof storageData == 'object' && storageData != null){
 
 
-                 var ctx = document.getElementById("bwChart"),
-                     maxLen =  1;
-                 var datasets  =  Object.keys(bwBucketMap).map(val=>{
+                 let ctx = getElementById("bwChart"),
+                     maxLen =  1,
+                     datasets  =  Object.keys(displayTextByBWBucket).map(val=>{
                                 let data =  storageData[val] || [];
                                 if(data.length > maxLen){
                                     maxLen = data.length;
@@ -413,7 +470,7 @@ let drawHistoricalGraph = ()=>{
                                 return {
                                     fillColor : getRandomColor(),
                                     strokeColor : getRandomColor(),
-                                    label:bwBucketMap[val],
+                                    label:displayTextByBWBucket[val],
                                     data ,
                                     backgroundColor : 'transparent',
                                     borderColor: getRandomColor(),
@@ -428,43 +485,42 @@ let drawHistoricalGraph = ()=>{
                                     pointHitRadius: 10,
                                     lineTension: 0
                                 }
-                         })
-                 var options   =  {
-                    type: 'line',
-                    xLabel: 'Index',
-                    yLabel:'Bandwidth',
-                   
-                    data : {
-                         datasets :datasets  ,
-                         labels: Array.apply(null, new Array(maxLen)).map( (val, idx)=>{return idx+1}),
-                         backgroundColor : 'transparent',
-                    },
-                  
-                    
-                    options: {
-                        responsive :true,
-                        maintainAspectRatio : true,
-                        scales: {
-                            type:'linear',
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero:true
-                                },
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'BandWidth'
-                                }
-                            }],
-                            xAxes : [{
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Index'
-                                }
-                            }]
+                         }),
+                    options   =  {
+                        type: 'line',
+                        xLabel: 'Index',
+                        yLabel:'Bandwidth',
+                       
+                        data : {
+                             datasets :datasets  ,
+                             labels: Array.apply(null, new Array(maxLen)).map( (val, idx)=>{return idx+1}),
+                             backgroundColor : 'transparent',
+                        },
+                        options: {
+                            responsive :true,
+                            maintainAspectRatio : true,
+                            scales: {
+                                type:'linear',
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero:true
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'BandWidth'
+                                    }
+                                }],
+                                xAxes : [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Index'
+                                    }
+                                }]
+                            }
                         }
-                    }
-                };
-                    var myChart = new Chart(ctx,options);
+                    };
+                    
+                    new Chart(ctx,options);
 
             }else{
                 console.log(`storage type is not object but `, typeof storageData)
@@ -476,44 +532,46 @@ let drawHistoricalGraph = ()=>{
    
 }
 
+/**
+* Plots the bandwidth against the index of each request
+*/
 
 let displayBandwidthChart =  (arr, ele)=>{
-    var ctx = ele || document.getElementById("myChart");
-    var options =  {
-    type: 'line',
+    let ctx = ele,
+       options =  {
+             type: 'line',
    
-    data : {
-         labels: Array.apply(null, new Array(arr.length)).map( (val, idx)=>{return idx+1}),
-         datasets : [{
-            label:'Bandwidth Per Resource',
-            data : arr,
-            lineTension:0
-        }],
-    },
-  
-    
-    options: {
-        responsive :true,
-        maintainAspectRatio : true,
-        scales: {
-            type:'linear',
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                },
-                scaleLabel: {
-                    display: true,
-                    labelString: 'BandWidth'
+             data : {
+                 labels: Array.apply(null, new Array(arr.length)).map( (val, idx)=>{return idx+1}),
+                 datasets : [{
+                    label:'Bandwidth Per Resource',
+                    data : arr,
+                    lineTension:0
+                 }],
+             },
+             options: {
+                responsive :true,
+                maintainAspectRatio : true,
+                scales: {
+                    type:'linear',
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'BandWidth'
+                        }
+                    }],
+                    xAxes :[{
+                       scaleLabel: {
+                            display: true,
+                            labelString: 'Index'
+                        } 
+                    }]
                 }
-            }],
-            xAxes :[{
-               scaleLabel: {
-                    display: true,
-                    labelString: 'Index'
-                } 
-            }]
+             }
         }
-    }
-}
-var myChart = new Chart(ctx, options);
+
+    new Chart(ctx, options);
 }

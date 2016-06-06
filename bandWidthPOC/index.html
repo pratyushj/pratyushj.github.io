@@ -26,33 +26,30 @@
 			top: 10%;
 		}
 		#bwContainer {
-			display: inline-block;
+			/*display: inline-block;
 			position: relative;
 			left: 0%;
 			width: 40%;
-			top: 10%;
+			top: 10%;*/
 			font-size: 16px;
 		}
 		label{
 			text-align: center;
 		}
-		#ctrlPanel {
-			width:100%;
-		}
 		#currentDataPoints{
-			width: 50%;
+			/*width: 50%;
 			height: 50%;
 			position: relative;
 			left:8%;
-			display: inline-block;
+			display: inline-block;*/
 
 		}
 		#downloadDataPoints{
-			width: 50%;
-			height: 50%;
-			position: relative;
-			left:8%;
-			display: inline-block;
+			/*width: 50%;*/
+			/*height: 50%;*/
+			/*position: relative;*/
+			/*left:8%;*/
+			/*display: inline-block;*/
 		}
 		#bwDataPoints {
 			width: 50%;
@@ -65,24 +62,24 @@
 </head>
 <body>
 
-<div id='container' class="container">
-	<div id="ctrlPanel" class="text-center">
+<div id='container' class="container row">
+	<div id="ctrlPanel" class="col-xs-4 text-center">
 	<label class='text-center'>Control Panel</label>
 		<table class="table table-bordered">
 		<tbody>
 			<tr>
 				<td>Request Type</td>
-				<td id='optionContainer'>
-				
-				</td>
+				<td id='optionContainer'></td>
+			</tr>
+			<tr>
 				<td>Bandwidth Type</td>
-				<td id='bandwidthContainer'>
-				</td>
+				<td id='bandwidthContainer'></td>
 			</tr>
 			<tr>
 				<td>Number Of Requests</td>
-				<td id='numberContainer'>	
-				</td>
+				<td id='numberContainer'></td>
+			</tr>
+			<tr>
 				<td><button type='button' class='btn btn-primary' id='saveCurrentBW'>Save This BW Data Point</button></td>
 				<td><button type='button' class='btn btn-danger' id='clearBwHistory'>Clear All The Data Points</button></td>
 			</tr>
@@ -109,7 +106,7 @@
 		</tbody>
 		</table>
 	</div>
-	<div id="bwContainer">
+	<div id="bwContainer" class='col-xs-8'>
 		<table class="bwTable table table-bordered table-striped">
 			<thead>
 				<tr>
@@ -147,13 +144,13 @@
 	 <b>Latency</b> : It is sum of round trip time from sending request to receiving first byte of response</br>
 	</p>		   
 </div>
-<div id='currentDataPoints'>
+<div id='currentDataPoints' class="col-xs-4 col-xs-offset-1">
 	<canvas id="myChart" width="400" height="400"></canvas>
 </div>
-<div id='downloadDataPoints'>
+<div id='downloadDataPoints' class="col-xs-4 col-xs-offset-1">
 	<canvas id="downloadChart" width="400" height="400"></canvas>
 </div>
-<div id='bwDataPoints'>
+<div id='bwDataPoints' class="col-xs-8 col-xs-offset-2">
 	<canvas id="bwChart" width="400" height="400"></canvas>
 </div>
 <div id="bwLoader" >
