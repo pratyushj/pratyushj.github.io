@@ -40,10 +40,12 @@ RequestInterceptor.prototype  =  {
         resources =  resources || performance.getEntriesByType('resource') ;
         let resourceVal =  resources.map( resource => {
             let totalSize =  resource.transferSize || parseInt(this.mapOfResponseSizeByResource[resource.name]),
-                totalTime =  resource.responseEnd - resource.requestStart
+                totalTime =  resource.responseEnd - resource.requestStart,
+                downloadTime =  resource.responseEnd - resource.responseStart
                 return {
                       totalSize,
                       totalTime, 
+                      downloadTime,
                       browserBlock : resource.requestStart - resource.startTime,
                       latency      : resource.responseStart - resource.requestStart,
                       duration : resource.duration,

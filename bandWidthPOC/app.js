@@ -49,6 +49,7 @@ let getTemplate  =  (data)=>{
             <td>${data.totalTime}</td>
             <td>${data.length}</td>
             <td>${data.bandwidth}</td>
+            <td>${data.download}</td>
             <td>${data.bandWidth_AM}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
@@ -112,12 +113,15 @@ let calculateBandWidth =  function(data,ele){
         latency =  0,
         bandWidth_GM =  1,
         bandWidthArr =  [],
+        downloadArr  =  [],
+        totalDownloadTime = 0,
         factor =  (8*1000)/ (1024*1024),
         bandWidth_AM;
 
     if( Array.isArray(data)){
     	data.forEach( (res) => {
     		totalTime +=  parseInt(res.totalTime); // responseEnd - requestStart
+            totalDownloadTime += parseInt(res.downloadTime);
     		totalSize += parseInt(res.totalSize);  // size
             duration  += parseInt(res.duration);   // duration
             browserBlock += parseInt(res.browserBlock); // requestStart - startTime
@@ -125,6 +129,7 @@ let calculateBandWidth =  function(data,ele){
             res.startTime  = res.startTime || 0;
             bandWidth_GM *= res.totalSize/res.totalTime // Geometric Mean of 
             bandWidthArr.push(parseFloat(res.totalSize/res.totalTime));
+            downloadArr.push(parseFloat(res.totalSize/res.downloadTime));
             // console.log(`Bandwidth is ${(res.totalSize*8*1000/(1024*1024* res.totalTime)).toFixed(2)} Mbps at ${res.startTime.toFixed(2)} ms`)
     	})
     }else{
@@ -134,6 +139,7 @@ let calculateBandWidth =  function(data,ele){
 
         totalSize  = (totalSize/(1024*1024)).toFixed(2); 
         totalTime  = convertMsToSeconds(totalTime);
+        totalDownloadTime = convertMsToSeconds(totalDownloadTime);
         duration  = convertMsToSeconds(duration);
         browserBlock  =  convertMsToSeconds(browserBlock);
         latency  =  convertMsToSeconds(latency);
@@ -142,12 +148,14 @@ let calculateBandWidth =  function(data,ele){
 
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
- 	var bandwidth =   (totalSize*8/totalTime).toFixed(2)
+ 	var bandwidth =   (totalSize*8/totalTime).toFixed(2),
+         download  = (totalSize*8/totalDownloadTime).toFixed(2);
  	console.log(`bandwidth calculated ${bandwidth}`);
 
 
     var template = getTemplate({
         bandwidth,
+        download,
         totalSize,
         totalTime,
         duration,
@@ -162,6 +170,7 @@ let calculateBandWidth =  function(data,ele){
     getElementById(ele).innerHTML = template;
     return {
         arr  : bandWidthArr.map(val=>val*factor),
+        downloadArray : downloadArr.map( val => val * factor),
         bandwidth
     };
 };
@@ -174,7 +183,8 @@ Events.on('BW_FALLBACK', function(data){
 Events.on('BW_SW', function(data){
 	var bwArr =  calculateBandWidth(data, 'bw2')
     displayBandwidthChart(bwArr.arr);
-    window.calcBW =  bwArr.bandwidth
+    window.calcBW =  bwArr.bandwidth;
+    displayBandwidthChart(bwArr.downloadArray, getElementById('downloadChart'));
 })
 Events.on('BW_SW_RES', function(data){
     calculateBandWidth(data, 'bw3')
@@ -467,8 +477,8 @@ let drawHistoricalGraph = ()=>{
 }
 
 
-let displayBandwidthChart =  (arr)=>{
-    var ctx = document.getElementById("myChart");
+let displayBandwidthChart =  (arr, ele)=>{
+    var ctx = ele || document.getElementById("myChart");
     var options =  {
     type: 'line',
    

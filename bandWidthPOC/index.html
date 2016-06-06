@@ -47,6 +47,13 @@
 			display: inline-block;
 
 		}
+		#downloadDataPoints{
+			width: 50%;
+			height: 50%;
+			position: relative;
+			left:8%;
+			display: inline-block;
+		}
 		#bwDataPoints {
 			width: 50%;
 			height: 50%;
@@ -110,8 +117,8 @@
 				<th>TotalSize ( MB)</th>
 				<th>TotalTime (secs)</th>
 				<th>Number Of Resources</th>
-				<th>BandWidth (Mbps) ( total_size/ total_download_time)</th>
-				<!-- <th>BandWidth (Mbps) ( GM of bandWidths)</th> -->
+				<th>BandWidth (Mbps) ( total_size/ total_time)</th>
+				<th>Download Speed (Mbps) (total_size / total_download_time)</th>
 				<th>BandWidth (Mbps) ( AM of bandWidths)</th>
 				<th>Duration (secs)</th>
 				<th>BrowserBlock (secs)</th>
@@ -141,10 +148,13 @@
 	</p>		   
 </div>
 <div id='currentDataPoints'>
-<canvas id="myChart" width="400" height="400"></canvas>
+	<canvas id="myChart" width="400" height="400"></canvas>
+</div>
+<div id='downloadDataPoints'>
+	<canvas id="downloadChart" width="400" height="400"></canvas>
 </div>
 <div id='bwDataPoints'>
-<canvas id="bwChart" width="400" height="400"></canvas>
+	<canvas id="bwChart" width="400" height="400"></canvas>
 </div>
 <div id="bwLoader" >
 	<p>Please Wait While We Display Bandwidth Details  ...</p>
