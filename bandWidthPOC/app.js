@@ -58,6 +58,7 @@ let getTemplate  =  (data)=>{
             <td>${data.bandwidth}</td>
             <td>${data.download}</td>
             <td>${data.bandWidth_AM}</td>
+            <td>${data.bandWidthByBoxWhiskers}</td>
             <td>${data.duration}</td>
             <td>${data.browserBlock}</td>
             <td>${data.latency}</td>`
@@ -127,6 +128,43 @@ let convertMsToSeconds  = (val) =>{
     return val/1000;
 }
 
+
+/**
+* Box and Whiskers plot
+*/
+
+let boxAndWhiskersPlot  =  (arr, resourceData)=>{
+    // sort the data 
+    // Q1, Q2, Q3 
+    // find Q3-Q1
+    //
+    let data  = arr.slice();  // The data is of bandwidth per index
+    data.sort((a, b)=>{
+        return parseFloat(a)- parseFloat(b);
+    })
+    let Q1  = data[Math.floor(data.length/4)],
+        Q2  = data[Math.floor(data.length/2)],
+        Q3  = data[Math.floor(data.length*3/4)],
+        IQR = Q3- Q1,
+        OUTLIER_LOW =  Q1 - 1.5*IQR,
+        OUTLIER_HIGH =  Q3 + 1.5*IQR,
+        totalTime = 0,
+        totalSize = 0;
+
+    resourceData.forEach( res =>{
+        let discreteBW =  res.totalSize/res.totalTime;
+        if(discreteBW > OUTLIER_LOW && discreteBW < OUTLIER_HIGH){
+            totalTime += parseInt(res.totalTime);
+            totalSize += parseInt(res.totalSize);
+        }else{
+            console.warn(`${discreteBW} is outlier`)
+        }
+    })
+     let bw =  ((totalSize*8*1000)/(totalTime*1024*1024)).toFixed(2);
+     console.log(bw) 
+     return bw;
+}
+
 /**
 * Calculates the bandwidth related data
 */
@@ -141,7 +179,8 @@ let calculateBandWidth =  function(data){
         downloadArr  =  [],
         totalDownloadTime = 0,
         factor =  (8*1000)/ (1024*1024),
-        bandWidth_AM;
+        bandWidth_AM,
+        bandWidthByBoxWhiskers = 0;
 
     if( Array.isArray(data)){
 
@@ -171,6 +210,7 @@ let calculateBandWidth =  function(data){
         latency  =  convertMsToSeconds(latency);
         bandWidth_GM  = addMbpsFactor(Math.pow(bandWidth_GM, 1/data.length) , factor );
         bandWidth_AM  = addMbpsFactor(filterData(bandWidthArr), factor);
+        bandWidthByBoxWhiskers =  boxAndWhiskersPlot(bandWidthArr, data)
 
 
     console.log(`totalSize is ${totalSize} Mb and totalTime is ${totalTime} secs`) 
@@ -190,7 +230,8 @@ let calculateBandWidth =  function(data){
         latency,
         length : data.length,
         bandWidth_GM,
-        bandWidth_AM
+        bandWidth_AM,
+        bandWidthByBoxWhiskers
     };
 };
 
@@ -364,6 +405,7 @@ let addBandwidthToTable  = (data, ele) =>{
         length : val.length,
         bandWidth_GM : val.bandWidth_GM,
         bandWidth_AM : val.bandWidth_AM,
+        bandWidthByBoxWhiskers : val.bandWidthByBoxWhiskers,
         ele
     })
     return val;
