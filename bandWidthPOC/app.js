@@ -321,9 +321,20 @@ let init  = ()=>{
     // Event Binding on Bandwidth I ( Service Worker + Request)
     Events.on('BW_SW', function(data){
         var val =  addBandwidthToTable(data, 'bw2')
-        displayBandwidthChart(val.arr, getElementById("myChart"));
+        let bandWidthOptions  = {
+            xLabelString : 'Index',
+            yLabelString : 'Bandwidth',
+            label        : 'Bandwidth Per Resource'
+        }
+
+        let downloadOptions =  {
+            xLabelString : 'Index',
+            yLabelString : 'Download Speed',
+            label        : 'Download Speed Per Resource'
+        }
+        displayBandwidthChart(val.arr, getElementById("myChart"), bandWidthOptions);
         window.calcBW =  val.bandwidth;
-        displayBandwidthChart(val.downloadArray, getElementById('downloadChart'));
+        displayBandwidthChart(val.downloadArray, getElementById('downloadChart'), downloadOptions);
     })
     // Event Binding on Bandwidth II
     Events.on('BW_SW_RES', function(data){
@@ -536,7 +547,7 @@ let drawHistoricalGraph = ()=>{
 * Plots the bandwidth against the index of each request
 */
 
-let displayBandwidthChart =  (arr, ele)=>{
+let displayBandwidthChart =  (arr, ele, chartOptions)=>{
     let ctx = ele,
        options =  {
              type: 'line',
@@ -544,7 +555,7 @@ let displayBandwidthChart =  (arr, ele)=>{
              data : {
                  labels: Array.apply(null, new Array(arr.length)).map( (val, idx)=>{return idx+1}),
                  datasets : [{
-                    label:'Bandwidth Per Resource',
+                    label: chartOptions.label,// 'Bandwidth Per Resource',
                     data : arr,
                     lineTension:0
                  }],
@@ -560,13 +571,13 @@ let displayBandwidthChart =  (arr, ele)=>{
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: 'BandWidth'
+                            labelString: chartOptions.yLabelString,//'BandWidth'
                         }
                     }],
                     xAxes :[{
                        scaleLabel: {
                             display: true,
-                            labelString: 'Index'
+                            labelString: chartOptions.xLabelString, //'Index'
                         } 
                     }]
                 }
