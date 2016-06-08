@@ -23,6 +23,9 @@ let displayTextByBWBucket =  {
 };
 
 let displayTextByCronInterval =  {
+        1  : '1 Min',
+        2  : '2 Mins',
+        5  :  '5 Mins',
         15 :  '15 Mins',
         30 :  '30 Mins',
         60 :  '1 Hour',
