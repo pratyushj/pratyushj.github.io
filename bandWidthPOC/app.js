@@ -39,7 +39,7 @@ let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0, // TODO REMOVE IT
     BW_OPTION_TYPE  = localStorage.getItem('BW_OPTION_TYPE');
 
 let CRON_STATUS =  'NOT_STARTED'  ;
-let CRON_INTERVAL = 15;  
+let CRON_INTERVAL = 1;
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
@@ -431,8 +431,9 @@ let init  = ()=>{
     getElementById('cronInterval').addEventListener('change', function(e){
             let cronInterval =  e.target.value;
             console.log(cronInterval)
-            // START 
-            startCron();
+            CRON_INTERVAL = cronInterval;
+            // START
+            //startCron();
     })
 
     // Events binding on the action raised after XMLHttpRequest method
@@ -456,6 +457,8 @@ let init  = ()=>{
         displayBandwidthChart(val.arr, getElementById("myChart"), bandWidthOptions);
         window.calcBW =  val.bandwidth;
         displayBandwidthChart(val.downloadArray, getElementById('downloadChart'), downloadOptions);
+        // here you put a request to add it
+        startCron();
     })
     // Event Binding on Bandwidth II
     Events.on('BW_SW_RES', function(data){
@@ -486,8 +489,6 @@ let updateCronStatus  =  (val)=>{
         }else if (CRON_STATUS == 'START'){
                 getElementById('cronInterval').disabled = false;
                 startCron();
-        }else{
-            return ;
         }
 }
 
@@ -731,7 +732,7 @@ let displayBandwidthChart =  (arr, ele, chartOptions)=>{
 
 
 // Cron Area
-let DATA_POST_URL =  '/pushData';
+let DATA_POST_URL =  'http://localhost:8085/pushData';
 let interval =  null;
 
 
@@ -740,8 +741,11 @@ let interval =  null;
 function startCron (){
 
     stopCron();
-    interval =  setInterval(pushData,CRON_INTERVAL*1000 )
+    if(CRON_STATUS =='START'){
+        interval =  setInterval(postInit,CRON_INTERVAL*60*1000 )
+    }
     pushData();
+
 }
 
 let stopCron =  ()=>{

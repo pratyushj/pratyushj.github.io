@@ -19,10 +19,15 @@
 
                     if (this.readyState === XMLHttpRequest.DONE && this.status == 200) {
                         var totalTime = Date.now() - this.totalTime;
-                        var totalSize = parseInt(this.getResponseHeader('Content-Length'));
-                        if (totalSize) {
-                            bandWidthCache.push({totalSize, totalTime})
+                        try{
+                            var totalSize = parseInt(this.getResponseHeader('Content-Length'));
+                            if (totalSize) {
+                                bandWidthCache.push({totalSize, totalTime})
+                            }
+                        }catch(e){
+                            console.error(e);
                         }
+
                     }
                     return readyStateChange.call(this, arguments)
                 }
