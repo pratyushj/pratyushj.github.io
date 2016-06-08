@@ -732,7 +732,7 @@ let displayBandwidthChart =  (arr, ele, chartOptions)=>{
 
 
 // Cron Area
-let DATA_POST_URL =  'http://localhost:8085/pushData';
+let DATA_POST_URL =  'https://shielded-temple-27251.herokuapp.com/pushData';
 let interval =  null;
 
 
@@ -760,7 +760,7 @@ function pushData (){
     if ( !bwValue || !bwType) {
       alert(`${ bwType == null? 'Select A BW Bucket' : 'Please wait for bandwidth to be calculated'}`)
       return  
-    } ; 
+    };
         
     let req =  new XMLHttpRequest();
 
