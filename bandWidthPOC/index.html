@@ -58,6 +58,14 @@
 			left:5%;
 			display: inline-block;
 		}
+		.btn-bw{
+			margin-right: 3px;
+			width: 50%;
+			height: 48px;
+		}
+		#requestNumID{
+			text-align: center
+		}
 	</style>
 </head>
 <body>
@@ -70,10 +78,6 @@
 			<tr>
 				<td>Request Type</td>
 				<td id='optionContainer'></td>
-			</tr>
-			<tr>
-				<td>Bandwidth Type</td>
-				<td id='bandwidthContainer'></td>
 			</tr>
 			<tr>
 				<td>Number Of Requests</td>
@@ -103,6 +107,20 @@
 				</td>
 
 			</tr>
+			<tr>
+				<td  colspan="2">BandWidth Bucket</td>
+			</tr>
+			<tr>
+				<td id='bandwidthContainer' colspan="2"></td>
+			</tr>
+			<tr id='cronStatus'>
+			</tr>
+			<tr>
+				<td>Interval</td>
+				<td id='cronIntervalContainer'>
+				</td>
+			</tr>
+			
 		</tbody>
 		</table>
 	</div>

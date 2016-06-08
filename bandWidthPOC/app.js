@@ -3,21 +3,40 @@ let displayTextByBWMethod =  {
     'bw2':'<strong>Bandwidth Method II (Service Worker + Resource Timing API Calculation At SW ) **</bold>',
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
 };
-
+let INITIATED =  false;
+// let displayTextByBWBucket =  {
+//     GPRS : 'GRPS ( 500ms, 50kb/s, 20kb.s)',
+//     R2G : 'Regular 2G(300ms, 250kb/s, 50kb/s)',
+//     G2G :'Good 2G(150ms, 450kb/s, 150kb/s)',
+//     R3G :'Regular 3G(100ms, 750kb/s, 250kb/s)',
+//     G3G :'Good 3G(40ms, 1.5Mb/s, 750kb/s)',
+//     R4G :'Regular 4G(20ms, 4.0Mb/s, 3.0Mb/s)',
+//     DSL :'DSL(5ms, 2.0Mb/s, 1.0Mb/s)',
+//     WIFI :'WiFi(2ms, 30Mb/s, 15Mb/s)',
+// };
 let displayTextByBWBucket =  {
-    GPRS : 'GRPS ( 500ms, 50kb/s, 20kb.s)',
-    R2G : 'Regular 2G(300ms, 250kb/s, 50kb/s)',
-    G2G :'Good 2G(150ms, 450kb/s, 150kb/s)',
-    R3G :'Regular 3G(100ms, 750kb/s, 250kb/s)',
-    G3G :'Good 3G(40ms, 1.5Mb/s, 750kb/s)',
-    R4G :'Regular 4G(20ms, 4.0Mb/s, 3.0Mb/s)',
-    DSL :'DSL(5ms, 2.0Mb/s, 1.0Mb/s)',
-    WIFI :'WiFi(2ms, 30Mb/s, 15Mb/s)',
+    GPRS : 'GRPS',
+    R2G : '2G',
+    R3G :'3G',
+    R4G :'4G',
+    BB :'Braodband',
+};
+
+let displayTextByCronInterval =  {
+        15 :  '15 Mins',
+        30 :  '30 Mins',
+        60 :  '1 Hour',
+        120 : '2 Hours',
+        720 : '6 Hours',
+        1440 : '1 Day'
 };
 
 let LEFT_FACTOR = localStorage.getItem('LEFT_FACTOR') || 0.0, // TODO REMOVE IT
     RIGHT_FACTOR = localStorage.getItem('RIGHT_FACTOR') || 1.0, //TODO REMOVE IT
     BW_OPTION_TYPE  = localStorage.getItem('BW_OPTION_TYPE');
+
+let CRON_STATUS =  'NOT_STARTED'  ;
+let CRON_INTERVAL = 15;  
 
 let getElementById = (ele) => {
     return document.getElementById(ele)
@@ -74,16 +93,54 @@ let optionTemplate =  (val)=>{
             </select>`
 };
 
+let statusTextById = {
+    'START' : 'STARTED',
+    'STOP'  : 'STOPPED',
+    'NOT_STARTED':'NOT_STARTED'
+}
+
+let cronStatusTemplate =  (status)=>{
+    var statusTxt ;
+     switch(status){
+        case 'NOT_STARTED':
+            statusTxt = 'START';
+            break;
+        case 'START':
+            statusTxt =  'STOP';
+            break;
+        case 'STOP':
+            statusTxt =  'START';
+            break;       
+    }
+    return `<td>
+            <button class='btn btn-default' value=${status} id='statusBtn'>${statusTxt}</button>
+            </td>
+            <td>
+                ${statusTextById[status]}
+            </td>`
+}
+
+let cronIntervalTemplate =  (val)=>{
+    return `
+            <select  class="form-control" id='cronInterval' disabled='true' value=${val}>`+
+            Object.keys(displayTextByCronInterval).map(key=>{
+                    return `<option  ${val == key ? 'selected':''} value=${key}>${displayTextByCronInterval[key]}</option>`
+            })+`</select>`
+}
+
 /**
 * Template for option of BandWidth Types
 */
 let bandWidthOptionTemplate  =  (val)=>{
-     return `<select id='bwOptionID' class='option' value='${val}'>
-            <option>--Select A bandwidth Bucket</option>`+
-                    Object.keys(displayTextByBWBucket).map(key =>{
-                        return `<option ${val == key ?'selected':''} value=${key}>${displayTextByBWBucket[key]}</option>`
-                    })+
-            `</select>`
+     // return `<select id='bwOptionID' class='option' value='${val}'>
+     //        <option>--Select A bandwidth Bucket</option>`+
+     //                Object.keys(displayTextByBWBucket).map(key =>{
+     //                    return `<option ${val == key ?'selected':''} value=${key}>${displayTextByBWBucket[key]}</option>`
+     //                })+
+     //        `</select>`
+     return `<div>` +Object.keys(displayTextByBWBucket).map(key =>{
+              return `<button class='${val == key ? 'btn btn-lg btn-bw btn-success':'btn btn-lg btn-bw btn-default'}'  value=${key} />${displayTextByBWBucket[key]}</button>`
+            }).join('') + `</div>`
 }
 
 /**
@@ -320,6 +377,7 @@ function processXMLResponse(req, index) {
 * called on initialization. Does the binding of event listener and initial population of input parameters in control panel
 */
 let init  = ()=>{
+    INITIATED = true;
     PARALLEL_REQUESTS = ( localStorage.getItem('PARALLEL_REQUESTS')  == 'true' ) || PARALLEL_REQUESTS;
 
 
@@ -327,17 +385,21 @@ let init  = ()=>{
 
     getElementById('numberContainer').innerHTML =  numberTemplate(NO_OF_DATA_POINTS)
 
-    getElementById('bandwidthContainer').innerHTML =  bandWidthOptionTemplate(BW_OPTION_TYPE)
+    getElementById('bandwidthContainer').innerHTML =  bandWidthOptionTemplate(BW_OPTION_TYPE);
+
+    getElementById('cronStatus').innerHTML =  cronStatusTemplate(CRON_STATUS);
+
+    getElementById('cronIntervalContainer').innerHTML =  cronIntervalTemplate(CRON_INTERVAL);
 
     getElementById('requestOptionID').addEventListener('change',function(){
             PARALLEL_REQUESTS =   getElementById('requestOptionID').value == 'true' || false;
             localStorage.setItem('PARALLEL_REQUESTS', PARALLEL_REQUESTS);
             postInit()
     })
-
-    getElementById('bwOptionID').addEventListener('change', function(){
-        BW_OPTION_TYPE = getElementById('bwOptionID').value || BW_OPTION_TYPE;
-        localStorage.setItem('BW_OPTION_TYPE',BW_OPTION_TYPE)
+    document.querySelector('#bandwidthContainer').addEventListener('click', function(e){
+        BW_OPTION_TYPE = e.target.value || BW_OPTION_TYPE;
+        localStorage.setItem('BW_OPTION_TYPE',BW_OPTION_TYPE);
+        this.innerHTML =  bandWidthOptionTemplate(BW_OPTION_TYPE);
     })
 
     getElementById('requestNumID').addEventListener('change', function(){
@@ -353,6 +415,21 @@ let init  = ()=>{
     })//
     getElementById('drawHistoricalBW').addEventListener('click', function(){
         drawHistoricalGraph()
+    })
+
+    getElementById('cronStatus').addEventListener('click', function(e){
+        let nextStatus  =  e.target.innerHTML;
+        updateCronStatus(nextStatus)
+        //START
+         
+
+    })
+
+    getElementById('cronInterval').addEventListener('change', function(e){
+            let cronInterval =  e.target.value;
+            console.log(cronInterval)
+            // START 
+            startCron();
     })
 
     // Events binding on the action raised after XMLHttpRequest method
@@ -388,9 +465,28 @@ let init  = ()=>{
 
 // on load make a call to fetch assets 
 window.addEventListener('load', function(e){
+    if(window.navigator.onLine){
         init();
-        postInit();    
+        postInit();
+    }else{
+        alert('offline')
+    }
+            
 })
+
+let updateCronStatus  =  (val)=>{
+    CRON_STATUS = val;
+    getElementById('cronStatus').innerHTML =  cronStatusTemplate(CRON_STATUS)
+        if(CRON_STATUS == 'STOP'){
+                getElementById('cronInterval').disabled = true;
+                stopCron();
+        }else if (CRON_STATUS == 'START'){
+                getElementById('cronInterval').disabled = false;
+                startCron();
+        }else{
+            return ;
+        }
+}
 
 let addBandwidthToTable  = (data, ele) =>{
     var val =  calculateBandWidth(data);
@@ -628,3 +724,58 @@ let displayBandwidthChart =  (arr, ele, chartOptions)=>{
 
     new Chart(ctx, options);
 }
+
+
+
+// Cron Area
+let DATA_POST_URL =  '/pushData';
+let interval =  null;
+
+
+// this should be called when there is check on the cron value 
+
+function startCron (){
+
+    stopCron();
+    interval =  setInterval(pushData,CRON_INTERVAL*1000 )
+    pushData();
+}
+
+let stopCron =  ()=>{
+    clearInterval(interval);
+    interval  = null;
+}
+
+function pushData (){
+    let bwValue =  window.calcBW,
+        bwType =  BW_OPTION_TYPE;
+
+    if ( !bwValue || !bwType) {
+      alert(`${ bwType == null? 'Select A BW Bucket' : 'Please wait for bandwidth to be calculated'}`)
+      return  
+    } ; 
+        
+    let req =  new XMLHttpRequest();
+
+     req.open('POST', DATA_POST_URL, true)
+     req.onreadystatechange = function () {
+        
+     };
+     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+     req.send(JSON.stringify({
+        bwValue  ,
+        bwType 
+     }))
+}
+
+window.addEventListener('offline', function(){
+        stopCron();
+        updateCronStatus('STOP');
+}, false)
+
+window.addEventListener('online', function(){
+    if(!INITIATED){
+        init();
+        postInit();
+    }
+}, false)
