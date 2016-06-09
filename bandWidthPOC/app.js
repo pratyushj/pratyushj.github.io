@@ -4,6 +4,12 @@ let displayTextByBWMethod =  {
     'bw3':'Bandwidth Method III (Service Worker + Resource Timing API at Application ) **'
 };
 let INITIATED =  false;
+
+let uuidKey  = sessionStorage.getItem('uuidKey');
+if(!uuidKey){
+    uuidKey = uuid.v4();
+    sessionStorage.setItem('uuidKey',uuidKey)
+}
 // let displayTextByBWBucket =  {
 //     GPRS : 'GRPS ( 500ms, 50kb/s, 20kb.s)',
 //     R2G : 'Regular 2G(300ms, 250kb/s, 50kb/s)',
@@ -784,7 +790,8 @@ function pushData (){
      req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
      req.send(JSON.stringify({
         bwValue  ,
-        bwType 
+        bwType,
+        sessionKey:uuidKey
      }))
      return true;
 }
