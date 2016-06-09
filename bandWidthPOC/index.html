@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Bandwidth POC</title>
     <link rel="stylesheet" href="libraries/bootstrap.min.css"/>
 	<style>
@@ -14,7 +15,7 @@
 			left: 0%;
 			width: 100%;
 			top: 5%;
-			font-size: 20px;
+			font-size: 1.2em;
 		}
 		table,th,td{
 			border: 1px solid lightgrey;
@@ -31,7 +32,7 @@
 			left: 0%;
 			width: 40%;
 			top: 10%;*/
-			font-size: 16px;
+			font-size: 1em;
 		}
 		label{
 			text-align: center;
@@ -60,7 +61,7 @@
 		}
 		.btn-bw{
 			margin-right: 3px;
-			width: 50%;
+			width: 32%;
 			height: 48px;
 		}
 		#requestNumID{
@@ -70,110 +71,116 @@
 </head>
 <body>
 
-<div id='container' class="container row">
-	<div id="ctrlPanel" class="col-xs-4 text-center">
-	<label class='text-center'>Control Panel</label>
-		<table class="table table-bordered">
-		<tbody>
-			<tr>
-				<td>Request Type</td>
-				<td id='optionContainer'></td>
-			</tr>
-			<tr>
-				<td>Number Of Requests</td>
-				<td id='numberContainer'></td>
-			</tr>
-			<tr>
-				<td><button type='button' class='btn btn-primary' id='saveCurrentBW'>Save This BW Data Point</button></td>
-				<td><button type='button' class='btn btn-danger' id='clearBwHistory'>Clear All The Data Points</button></td>
-			</tr>
-			<tr>
-				<td>Draw Hostorical Bandwidth Graph</td>
-				<td><button type='button' class='btn btn-primary' id='drawHistoricalBW'>Draw Graph</button></td>
-			</tr>
-			<tr style="display:none">
-				<td>Low Pass Filtering Index</td>
-				<td>
-					<span id='labelForslider1'></span>
-					<input id="slider1" name='slider1' type="range" min="0" max="1" step="0.01" />
-				</td>
-				
-			</tr>
-			<tr style="display:none">
-				<td>High Pass Filtering Index</td>
-				<td>
-					<span id='labelForslider2'></span>
-					<input id="slider2" name='slider2' type="range" min="0" max="1" step="0.01" />
-				</td>
+<div id='container' class="container">
+	<div class="row">
+		<div id="ctrlPanel" class="col-xs-12 col-md-4 text-center">
+			<label class='text-center' style="font-size: 2em; font-weight:700">Control Panel</label>
+			<table class="table table-bordered">
+				<tbody>
+					<tr>
+						<td>Request Type</td>
+						<td id='optionContainer'></td>
+					</tr>
+					<tr>
+						<td>Number Of Requests</td>
+						<td id='numberContainer'></td>
+					</tr>
+					<tr>
+						<td><button type='button' class='btn btn-primary' id='saveCurrentBW'>Save BW</button></td>
+						<td><button type='button' class='btn btn-danger' id='clearBwHistory'>Clear ALL</button></td>
+					</tr>
+					<tr>
+						<td>Draw Historical Bandwidth Graph</td>
+						<td><button type='button' class='btn btn-primary' id='drawHistoricalBW'>Draw Graph</button></td>
+					</tr>
+					<tr style="display:none">
+						<td>Low Pass Filtering Index</td>
+						<td>
+							<span id='labelForslider1'></span>
+							<input id="slider1" name='slider1' type="range" min="0" max="1" step="0.01" />
+						</td>
+						
+					</tr>
+					<tr style="display:none">
+						<td>High Pass Filtering Index</td>
+						<td>
+							<span id='labelForslider2'></span>
+							<input id="slider2" name='slider2' type="range" min="0" max="1" step="0.01" />
+						</td>
 
-			</tr>
-			<tr>
-				<td  colspan="2">BandWidth Bucket</td>
-			</tr>
-			<tr>
-				<td id='bandwidthContainer' colspan="2"></td>
-			</tr>
-			<tr id='cronStatus'>
-			</tr>
-			<tr>
-				<td>Interval</td>
-				<td id='cronIntervalContainer'>
-				</td>
-			</tr>
-			
-		</tbody>
-		</table>
-	</div>
-	<div id="bwContainer" class='col-xs-8'>
-		<table class="bwTable table table-bordered table-striped">
-			<thead>
-				<tr>
-				<th>Method</th>
-				<th>TotalSize ( MB)</th>
-				<th>TotalTime (secs)</th>
-				<th>Number Of Resources</th>
-				<th>BandWidth (Mbps) ( total_size/ total_time)</th>
-				<th>Download Speed (Mbps) (total_size / total_download_time)</th>
-				<th>BandWidth (Mbps) ( AM of bandWidths)</th>
-				<th>Bandwidth (Mbps) ( Box and Whiskers Model)</th>
-				<th>Duration (secs)</th>
-				<th>BrowserBlock (secs)</th>
-				<th>Latency (secs)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr id="bw1"></tr>
-				<tr id="bw2"></tr>
-				<tr id="bw3" ></tr>
-			</tbody>
-		</table>
+					</tr>
+					<tr>
+						<td  colspan="2" style="background-color:lightgrey">BandWidth Bucket</td>
+					</tr>
+					<tr>
+						<td id='bandwidthContainer' colspan="2"></td>
+					</tr>
+					<tr>
+						<td colspan="2" style="background-color:lightgrey">Cron Settings </td>
+					</tr>
+					<tr>
+						<td>Interval</td>
+						<td id='cronIntervalContainer'>
+						</td>
+					</tr>
+					<tr id='cronStatus'>
+					</tr>
+					
+				</tbody>
+			</table>
+		</div>
+		<div id="bwContainer" class='col-md-8 col-xs-12'>
+			<table class="bwTable table table-bordered table-striped">
+				<thead>
+					<tr>
+					<th>Method</th>
+					<th class="hidden-xs">TotalSize ( MB)</th>
+					<th class="hidden-xs">TotalTime (secs)</th>
+					<th class="hidden-xs">Number Of Resources</th>
+					<th>BandWidth (Mbps) ( total_size/ total_time)</th>
+					<th class="hidden-xs">Download Speed (Mbps) (total_size / total_download_time)</th>
+					<th class="hidden-xs">BandWidth (Mbps) ( AM of bandWidths)</th>
+					<th>Bandwidth (Mbps) ( Box and Whiskers Model)</th>
+					<th class="hidden-xs">Duration (secs)</th>
+					<th class="hidden-xs">BrowserBlock (secs)</th>
+					<th class="hidden-xs">Latency (secs)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id="bw1"></tr>
+					<tr id="bw2"></tr>
+					<tr id="bw3" ></tr>
+				</tbody>
+			</table>
+	<div class="hidden-xs">		
+		<b>*</b> Intercepts all the  HTTP requests  made by javascript ( not including browser initiated requests) in the front end code and does a calculation of bandwidth.
+		  However, the time taken in this case is inclusive of queue time, latency, server processing time etc etc
+		<br/>
+		<br/>
+		<b>**</b> Intercepts all the HTTP Requests made in the webapp ( including browser initiated requests) at the Service Worker Layer. The time taken for calculation is only the
+				   time for which the content is downloaded (responseEnd - responseStart). So, it should be more precise
 
-	<b>*</b> Intercepts all the  HTTP requests  made by javascript ( not including browser initiated requests) in the front end code and does a calculation of bandwidth.
-	  However, the time taken in this case is inclusive of queue time, latency, server processing time etc etc
-	<br/>
-	<br/>
-	<b>**</b> Intercepts all the HTTP Requests made in the webapp ( including browser initiated requests) at the Service Worker Layer. The time taken for calculation is only the
-			   time for which the content is downloaded (responseEnd - responseStart). So, it should be more precise
-
-	<p>
-	 <b>Duration</b> : It is the sum of duration taken for each request (i.e. responseEnd - startTime)</br>
-	 <b>TotalSize</b>: Sum of resource sizes being transferred</br>
-	 <b>TotalTime</b>: It is the sum of effective time taken for each request ( i.e. (responseEnd - requestStart))</br>
-	 <b>BrowserBlock</b>: It is the sum of time each request has been stalled by the browser due to primarily multiple requests being sent simultaneously.</br>
-	 <b>Latency</b> : It is sum of round trip time from sending request to receiving first byte of response</br>
-	</p>		   
+		<p>
+		 <b>Duration</b> : It is the sum of duration taken for each request (i.e. responseEnd - startTime)</br>
+		 <b>TotalSize</b>: Sum of resource sizes being transferred</br>
+		 <b>TotalTime</b>: It is the sum of effective time taken for each request ( i.e. (responseEnd - requestStart))</br>
+		 <b>BrowserBlock</b>: It is the sum of time each request has been stalled by the browser due to primarily multiple requests being sent simultaneously.</br>
+		 <b>Latency</b> : It is sum of round trip time from sending request to receiving first byte of response</br>
+		</p>
+	</div>			   
 </div>
-<div id='currentDataPoints' class="col-xs-4 col-xs-offset-1">
+<div id='currentDataPoints' class="col-md-4 col-xs-12 col-md-offset-1">
 	<canvas id="myChart" width="400" height="400"></canvas>
 </div>
-<div id='downloadDataPoints' class="col-xs-4 col-xs-offset-1">
+<div id='downloadDataPoints' class="col-md-4 col-xs-12 col-md-offset-1">
 	<canvas id="downloadChart" width="400" height="400"></canvas>
 </div>
-<div id='bwDataPoints' class="col-xs-8 col-xs-offset-2">
+<div id='bwDataPoints' class="col-md-8 col-xs-12 col-md-offset-2">
 	<canvas id="bwChart" width="400" height="400"></canvas>
 </div>
 <div id="bwLoader" >
 	<p>Please Wait While We Display Bandwidth Details  ...</p>
+</div>
 </div>
 </div>
 </body>

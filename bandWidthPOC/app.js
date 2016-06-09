@@ -74,16 +74,16 @@ let getTemplate  =  (data)=>{
     var text =  displayTextByBWMethod[data.ele]
     // <td>${data.bandWidth_GM}</td>
     return `<td>${text}</td>
-            <td>${data.totalSize}</td>
-            <td>${data.totalTime}</td>
-            <td>${data.length}</td>
+            <td class="hidden-xs">${data.totalSize}</td>
+            <td class="hidden-xs">${data.totalTime}</td>
+            <td class="hidden-xs">${data.length}</td>
             <td>${data.bandwidth}</td>
-            <td>${data.download}</td>
-            <td>${data.bandWidth_AM}</td>
+            <td class="hidden-xs">${data.download}</td>
+            <td class="hidden-xs">${data.bandWidth_AM}</td>
             <td>${data.bandWidthByBoxWhiskers}</td>
-            <td>${data.duration}</td>
-            <td>${data.browserBlock}</td>
-            <td>${data.latency}</td>`
+            <td class="hidden-xs">${data.duration}</td>
+            <td class="hidden-xs">${data.browserBlock}</td>
+            <td class="hidden-xs">${data.latency}</td>`
 };
 
 /**
@@ -101,31 +101,35 @@ let statusTextById = {
     'STOP'  : 'STOPPED',
     'NOT_STARTED':'NOT_STARTED'
 }
+let buttonText =  ['START', 'STOP'];
 
 let cronStatusTemplate =  (status)=>{
-    var statusTxt ;
+    var statusTxt ,className;
      switch(status){
         case 'NOT_STARTED':
             statusTxt = 'START';
+            className = 'btn btn-lg btn-success';
             break;
         case 'START':
             statusTxt =  'STOP';
+            className = 'btn btn-lg btn-danger';
             break;
         case 'STOP':
             statusTxt =  'START';
+            className = 'btn btn-lg btn-success'
             break;       
     }
-    return `<td>
-            <button class='btn btn-default' value=${status} id='statusBtn'>${statusTxt}</button>
+    return `<td>Status : ${statusTextById[status]}
             </td>
             <td>
-                ${statusTextById[status]}
-            </td>`
+                <button class='${className}' value=${status} id='statusBtn'>${statusTxt}</button>
+            </td>
+            `
 }
 
 let cronIntervalTemplate =  (val)=>{
     return `
-            <select  class="form-control" id='cronInterval' disabled='true' value=${val}>`+
+            <select  class="form-control" id='cronInterval'  value=${val}>`+
             Object.keys(displayTextByCronInterval).map(key=>{
                     return `<option  ${val == key ? 'selected':''} value=${key}>${displayTextByCronInterval[key]}</option>`
             })+`</select>`
@@ -142,7 +146,7 @@ let bandWidthOptionTemplate  =  (val)=>{
      //                })+
      //        `</select>`
      return `<div>` +Object.keys(displayTextByBWBucket).map(key =>{
-              return `<button class='${val == key ? 'btn btn-lg btn-bw btn-success':'btn btn-lg btn-bw btn-default'}'  value=${key} />${displayTextByBWBucket[key]}</button>`
+              return `<button class='${val == key ? 'btn btn-lg btn-bw btn-info':'btn btn-lg btn-bw btn-default'}'  value=${key} />${displayTextByBWBucket[key]}</button>`
             }).join('') + `</div>`
 }
 
@@ -422,6 +426,7 @@ let init  = ()=>{
 
     getElementById('cronStatus').addEventListener('click', function(e){
         let nextStatus  =  e.target.innerHTML;
+        if(buttonText.indexOf(nextStatus)!=-1)
         updateCronStatus(nextStatus)
         //START
          
@@ -481,14 +486,20 @@ window.addEventListener('load', function(e){
 })
 
 let updateCronStatus  =  (val)=>{
-    CRON_STATUS = val;
-    getElementById('cronStatus').innerHTML =  cronStatusTemplate(CRON_STATUS)
+    CRON_STATUS = val,flag = false;
+   
         if(CRON_STATUS == 'STOP'){
-                getElementById('cronInterval').disabled = true;
-                stopCron();
+                 flag = stopCron();
         }else if (CRON_STATUS == 'START'){
-                getElementById('cronInterval').disabled = false;
-                startCron();
+                flag =  startCron();
+        }
+        if(flag){
+                if(CRON_STATUS == 'STOP'){
+                    getElementById('cronInterval').disabled = false;
+                }else if(CRON_STATUS == 'START'){
+                    getElementById('cronInterval').disabled = true; 
+                }
+             getElementById('cronStatus').innerHTML =  cronStatusTemplate(CRON_STATUS)
         }
 }
 
@@ -744,18 +755,20 @@ function startCron (){
     if(CRON_STATUS =='START'){
         interval =  setInterval(postInit,CRON_INTERVAL*60*1000 )
     }
-    pushData();
+    return pushData();
 
 }
 
 let stopCron =  ()=>{
     clearInterval(interval);
     interval  = null;
+    return true;
 }
 
 function pushData (){
     let bwValue =  window.calcBW,
         bwType =  BW_OPTION_TYPE;
+        if(CRON_STATUS != 'START')return 
 
     if ( !bwValue || !bwType) {
       alert(`${ bwType == null? 'Select A BW Bucket' : 'Please wait for bandwidth to be calculated'}`)
@@ -773,6 +786,7 @@ function pushData (){
         bwValue  ,
         bwType 
      }))
+     return true;
 }
 
 window.addEventListener('offline', function(){
