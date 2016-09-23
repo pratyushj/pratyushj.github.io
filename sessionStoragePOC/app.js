@@ -6,7 +6,7 @@ window.onload =  function(){
 	document.querySelector('#counter').innerHTML =  count;
 	sessionStorage.setItem(itemName, count);
 	document.querySelector('#newWindowID').onclick  = function(){
-		window.open('/app.html') ;
+		window.open('./app.html') ;
 		e.stopPropagation();
 		return false;
 	}
